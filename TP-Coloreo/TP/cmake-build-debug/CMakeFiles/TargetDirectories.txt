@@ -1,0 +1,4 @@
+C:/Users/feder/Documents/Algoritmos/algoritmos/TP-Coloreo/TP/cmake-build-debug/CMakeFiles/TP.dir
+C:/Users/feder/Documents/Algoritmos/algoritmos/TP-Coloreo/TP/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/feder/Documents/Algoritmos/algoritmos/TP-Coloreo/TP/cmake-build-debug/CMakeFiles/main.dir
+C:/Users/feder/Documents/Algoritmos/algoritmos/TP-Coloreo/TP/cmake-build-debug/CMakeFiles/rebuild_cache.dir
