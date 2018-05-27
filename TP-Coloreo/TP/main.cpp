@@ -50,13 +50,15 @@ Solution::Solution() {
 }
 
 int Solution::loss_for_collision(){
+    auto copy_matrix = cost_conflict_matrix;
     int res = 0;
-    for(int i = 0; i < cost_conflict_matrix.size(); i ++) {
-        for(int k = 0; k < cost_conflict_matrix[i].size(); k++) {
+
+    for(int i = 0; i < copy_matrix.size(); i ++) {
+        for(int k = 0; k < copy_matrix[i].size(); k++) {
             if(assings[i] == assings[k]) {
-                res += cost_conflict_matrix[i][k];
-                cost_conflict_matrix[i][k] = 0;
-                cost_conflict_matrix[k][i] = 0;
+                res += copy_matrix[i][k];
+                copy_matrix[i][k] = 0;
+                copy_matrix[k][i] = 0;
             }
         }
     }
@@ -148,7 +150,7 @@ int main() {
     cin >> M;
 
     f = vector<Frequency>();
-    cost_conflict_matrix = vector<vi>(N, vector<int>(N));
+    cost_conflict_matrix = vector<vi>(N, vector<int>(N, 0));
 
     for(auto i = 0; i < T; i++) {
         cin >> current;
