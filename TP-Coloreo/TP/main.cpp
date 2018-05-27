@@ -55,6 +55,8 @@ int Solution::loss_for_collision(){
         for(int k = 0; k < cost_conflict_matrix[i].size(); k++) {
             if(assings[i] == assings[k]) {
                 res += cost_conflict_matrix[i][k];
+                cost_conflict_matrix[i][k] = 0;
+                cost_conflict_matrix[k][i] = 0;
             }
         }
     }
@@ -77,6 +79,7 @@ int Solution::functional() {
 
 void Solution::show_solution() { // por ahora no escribe en files
     for(auto frec_id : assings) { cout << frec_id << endl; }
+    cout << "Costo: " << functional() << endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
