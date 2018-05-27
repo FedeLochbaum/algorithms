@@ -134,22 +134,36 @@ Solution greedy_solution(int seed_vertex) {
     return sol;
 }
 
+Solution local_search(Solution greedy_solution) {
+    //TODO: Por ahora planteo una idea simple de mejoramiento
+    Solution sol = greedy_solution;
+    while(!local_optimum(sol)) {
+        Solution near_sol = optimize_solution(sol);
+        if(near_sol.functional() <= sol.functional()) {
+            sol = near_sol;
+        }
+    }
+
+    return sol;
+}
+
 bool stop_criteria() { return current_iterations >= maximum_iterations || time(0) >= start_time + maximum_time; }
 
 Solution grasp() {
+    // Ver como contemplar no agarrar una nueva frecuecnia si la perdida es menor que el costo de la frecuencia
     start_time = time(0);
     current_iterations = 0;
 
-    srand(static_cast<unsigned int>(time(nullptr)));
-    int seed_vertex = rand() % N;
-
-    Solution global_solution = greedy_solution(seed_vertex);
+    Solution global_solution = greedy_solution(0);
 
     while(!stop_criteria()) {
-//        Solution current_solution = local_search(global_solution);
-//        if(current_solution.functional() < global_solution.functional()) {
-//            global_solution = current_solution;
-//        }
+        srand(static_cast<unsigned int>(time(nullptr)));
+        int seed_vertex = (rand() + current_iterations) % N;
+
+        Solution current_solution = local_search(greedy_solution(seed_vertex));
+        if(current_solution.functional() < global_solution.functional()) {
+            global_solution = current_solution;
+        }
         current_iterations++;
     }
 
