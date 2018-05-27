@@ -24,7 +24,7 @@ mi general_graph;
 
 ////////////////////////////////////////////// Stop Criteria ///////////////////////////////////////////////
 int maximum_iterations = 1000;
-int current_iterations;
+int current_iteration;
 int maximum_time = 300; // 5 minutes
 time_t start_time;
 
@@ -147,24 +147,24 @@ Solution local_search(Solution greedy_solution) {
     return sol;
 }
 
-bool stop_criteria() { return current_iterations >= maximum_iterations || time(0) >= start_time + maximum_time; }
+bool stop_criteria() { return current_iteration >= maximum_iterations || time(0) >= start_time + maximum_time; }
 
 Solution grasp() {
     // Ver como contemplar no agarrar una nueva frecuecnia si la perdida es menor que el costo de la frecuencia
     start_time = time(0);
-    current_iterations = 0;
+    current_iteration = 0;
 
     Solution global_solution = greedy_solution(0);
 
     while(!stop_criteria()) {
         srand(static_cast<unsigned int>(time(nullptr)));
-        int seed_vertex = (rand() + current_iterations) % N;
+        int seed_vertex = (rand() + current_iteration) % N;
 
         Solution current_solution = local_search(greedy_solution(seed_vertex));
         if(current_solution.functional() < global_solution.functional()) {
             global_solution = current_solution;
         }
-        current_iterations++;
+        current_iteration++;
     }
 
     return global_solution;
