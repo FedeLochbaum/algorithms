@@ -48,12 +48,19 @@ struct Solution {
     int loss_for_collision();
     int cost_of_frequencies();
     void show_solution();
+    void update_frequencies();
 };
 
 Solution::Solution() {
     y = vi(T,0);
     assings = vi(N, -1);
     graph = general_graph;
+}
+
+void Solution::update_frequencies() {
+    //TODO: optimizar
+    y = vi(y.size(), 0);
+    for (int assing : assings) { y[assing] = 1; }
 }
 
 int Solution::loss_for_collision(){
@@ -134,13 +141,21 @@ Solution greedy_solution(int seed_vertex) {
     return sol;
 }
 
-Solution local_search(Solution greedy_solution) {
-    //TODO: Por ahora planteo una idea simple de mejoramiento
-    Solution sol = greedy_solution;
-    while(!local_optimum(sol)) {
-        Solution near_sol = optimize_solution(sol);
-        if(near_sol.functional() <= sol.functional()) {
-            sol = near_sol;
+Solution local_search(Solution sol) {
+    // no es factorial, deberia ser factorial
+    for(int i = 0; i < N; i ++) {
+        for(int f = 0; f < T; f++) {
+            int old_freq = sol.assings[i];
+            int old_cost = sol.functional();
+            if(old_freq != f) {
+                sol.assings[i] = f;
+                sol.update_frequencies();
+
+                if(old_cost < sol.functional()) {
+                    sol.assings[i] = old_freq;
+                    sol.y[old_freq] = 1;
+                }
+            }
         }
     }
 
@@ -150,7 +165,6 @@ Solution local_search(Solution greedy_solution) {
 bool stop_criteria() { return current_iteration >= maximum_iterations || time(0) >= start_time + maximum_time; }
 
 Solution grasp() {
-    // Ver como contemplar no agarrar una nueva frecuecnia si la perdida es menor que el costo de la frecuencia
     start_time = time(0);
     current_iteration = 0;
 
