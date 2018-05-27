@@ -22,6 +22,13 @@ int N; // numero de antenas disponibles
 int M; // numero de conflictos posibbles por asignar con la misma frecuencia
 mi general_graph;
 
+////////////////////////////////////////////// Stop Criteria ///////////////////////////////////////////////
+int maximum_iterations = 1000;
+int current_iterations;
+int maximum_time = 300; // 5 minutes
+time_t start_time;
+
+
 vector<Frequency> f;  // indica el costo de usar la frecuencia i
 mi cost_conflict_matrix; // costo de colisiones de frecuencias para el par de antenas i, k
 
@@ -81,7 +88,7 @@ int Solution::functional() {
 
 void Solution::show_solution() { // por ahora no escribe en files
     for(auto frec_id : assings) { cout << frec_id << endl; }
-    cout << "Costo: " << functional() << endl;
+    cout << "Cost: " << functional() << endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -127,19 +134,24 @@ Solution greedy_solution(int seed_vertex) {
     return sol;
 }
 
+bool stop_criteria() { return current_iterations >= maximum_iterations || time(0) >= start_time + maximum_time; }
 
 Solution grasp() {
-    srand(static_cast<unsigned int>(time(nullptr)));
+    start_time = time(0);
+    current_iterations = 0;
 
+    srand(static_cast<unsigned int>(time(nullptr)));
     int seed_vertex = rand() % N;
+
     Solution global_solution = greedy_solution(seed_vertex);
 
-//    while(!stop_criteria()) {
-//        Solution current_solution = local_search(greedy_solution());
+    while(!stop_criteria()) {
+//        Solution current_solution = local_search(global_solution);
 //        if(current_solution.functional() < global_solution.functional()) {
 //            global_solution = current_solution;
 //        }
-//    }
+        current_iterations++;
+    }
 
     return global_solution;
 }

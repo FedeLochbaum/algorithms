@@ -27,8 +27,8 @@
       <file leaf-file-name="main.cpp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="408">
-              <caret line="81" column="102" lean-forward="true" selection-start-line="81" selection-start-column="102" selection-end-line="81" selection-end-column="102" />
+            <state relative-caret-position="493">
+              <caret line="155" column="27" lean-forward="true" selection-start-line="155" selection-start-column="27" selection-end-line="155" selection-end-column="27" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
@@ -36,11 +36,47 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="miles750.colcep" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/instances/miles750.colcep">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="204">
+              <caret line="12" column="6" lean-forward="true" selection-end-line="2149" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="r1000.1.colcep" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/instances/r1000.1.colcep">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="187">
+              <caret line="11" column="1" lean-forward="true" selection-end-line="14434" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="miles1500.colcep" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/instances/miles1500.colcep">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="255">
+              <caret line="15" column="1" lean-forward="true" selection-end-line="5274" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="r250.1.colcep" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/instances/r250.1.colcep">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="238">
+              <caret line="14" column="2" lean-forward="true" selection-end-line="888" />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="input_example.txt" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/instances/input_example.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="11" column="7" lean-forward="true" selection-end-line="11" selection-end-column="7" />
+            <state relative-caret-position="170">
+              <caret line="10" column="6" lean-forward="true" selection-start-line="10" selection-start-column="6" selection-end-line="10" selection-end-column="6" />
             </state>
           </provider>
         </entry>
@@ -148,12 +184,12 @@
       <workItem from="1527272599558" duration="2051000" />
       <workItem from="1527283120448" duration="12229000" />
       <workItem from="1527366028981" duration="15765000" />
-      <workItem from="1527392732914" duration="6308000" />
+      <workItem from="1527392732914" duration="13065000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="52918000" />
+    <option name="totallyTimeSpent" value="59675000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1096" extended-state="6" />
@@ -431,17 +467,52 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/instances/miles250.colcep">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="20" column="7" lean-forward="true" selection-start-line="20" selection-start-column="7" selection-end-line="20" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/instances/input_example.txt">
       <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="10" column="6" lean-forward="true" selection-start-line="10" selection-start-column="6" selection-end-line="10" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/instances/r250.1.colcep">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="14" column="2" lean-forward="true" selection-end-line="888" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/instances/miles1500.colcep">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="15" column="1" lean-forward="true" selection-end-line="5274" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/instances/r1000.1.colcep">
+      <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="187">
-          <caret line="11" column="7" lean-forward="true" selection-end-line="11" selection-end-column="7" />
+          <caret line="11" column="1" lean-forward="true" selection-end-line="14434" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/instances/miles750.colcep">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="12" column="6" lean-forward="true" selection-end-line="2149" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="81" column="102" lean-forward="true" selection-start-line="81" selection-start-column="102" selection-end-line="81" selection-end-column="102" />
+        <state relative-caret-position="493">
+          <caret line="155" column="27" lean-forward="true" selection-start-line="155" selection-start-column="27" selection-end-line="155" selection-end-column="27" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>
