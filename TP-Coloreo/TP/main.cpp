@@ -20,17 +20,15 @@ int current, i, j, cost;
 int T; // numero de frecuecncias
 int N; // numero de antenas disponibles
 int M; // numero de conflictos posibbles por asignar con la misma frecuencia
-mi general_graph;
+mi graph;
+vector<Frequency> f;  // indica el costo de usar la frecuencia i
+mi cost_conflict_matrix; // costo de colisiones de frecuencias para el par de antenas i, k
 
 ////////////////////////////////////////////// Stop Criteria ///////////////////////////////////////////////
 int maximum_iterations = 1000;
 int current_iteration;
 int maximum_time = 300; // 5 minutes
 time_t start_time;
-
-
-vector<Frequency> f;  // indica el costo de usar la frecuencia i
-mi cost_conflict_matrix; // costo de colisiones de frecuencias para el par de antenas i, k
 
 ///////////////////////////////////////////// Order function //////////////////////////////////////////////
 bool order_func (Frequency i, Frequency j) { return (i.cost_of_use < j.cost_of_use); }
@@ -41,7 +39,6 @@ bool order_func (Frequency i, Frequency j) { return (i.cost_of_use < j.cost_of_u
 struct Solution {
     vi y; // 0 o 1 si la frecuencia con id i esta usada
     vi assings; // assings[i] indica la frecuencia asignada al vertice i.
-    mi graph;
 
     Solution();
     int functional();
@@ -54,7 +51,6 @@ struct Solution {
 Solution::Solution() {
     y = vi(T,0);
     assings = vi(N, -1);
-    graph = general_graph;
 }
 
 void Solution::update_frequencies() {
@@ -110,11 +106,11 @@ Solution greedy_solution(int seed_vertex) {
     sol.y[freq.number_id] = 1;
     sol.assings[seed_vertex] = freq.number_id;
 
-    for(int i = 0; i < sol.graph.size(); i++) {
+    for(int i = 0; i < graph.size(); i++) {
         if(sol.assings[i] == -1) { // Si el vertice actual no tiene frecuencia asignada
             vector<Frequency> possible_frequencies = f;
-            for(int e = 0; e < sol.graph[i].size(); e++) {
-                auto current_e = sol.graph[i][e];
+            for(int e = 0; e < graph[i].size(); e++) {
+                auto current_e = graph[i][e];
                 if(sol.assings[current_e] != -1) { // Si el vertice lindante ya posee un color
 
                     // Se busca la frecuencia con id = sol.assings[sol.graph[i][e]] y se elimina
@@ -142,7 +138,6 @@ Solution greedy_solution(int seed_vertex) {
 }
 
 Solution local_search(Solution sol) {
-    // no es factorial, deberia ser factorial
     for(int i = 0; i < N; i ++) {
         for(int f = 0; f < T; f++) {
             int old_freq = sol.assings[i];
@@ -200,7 +195,7 @@ int main() {
     // Se ordena f por costo de uso
     sort (f.begin(), f.end(), order_func);
 
-    general_graph = vector<vi>(N, vi());
+    graph = vector<vi>(N, vi());
 
     for(auto e = 0; e < M; e++) {
         cin >> i;
@@ -214,8 +209,8 @@ int main() {
         cost_conflict_matrix[i][j] = cost;
         cost_conflict_matrix[j][i] = cost;
 
-        general_graph[i].push_back(j);
-        general_graph[j].push_back(i);
+        graph[i].push_back(j);
+        graph[j].push_back(i);
     }
 
     grasp().show_solution();
