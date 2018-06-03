@@ -3,6 +3,7 @@
 #include <vector>
 #include <ctime>
 #include <algorithm>
+#include <fstream>
 
 using namespace std;
 
@@ -193,44 +194,49 @@ Solution grasp() {
 }
 
 int main() {
-    cin >> N;
-    cin >> T;
-    cin >> M;
+    std::string filename = R"(..\instances\miles250.colcep)";
+    std::ifstream istrm(filename);
 
-    f = vector<Frequency>();
-    cost_conflict_matrix = vector<vi>(N, vector<int>(N, 0));
+    if(istrm.is_open()) {
+        istrm >> N;
+        istrm >> T;
+        istrm >> M;
 
-    for(auto i = 0; i < T; i++) {
-        cin >> current;
-        f.push_back({current, i}); // {current, i} :: Frequency
+        f = vector<Frequency>();
+        cost_conflict_matrix = vector<vi>(N, vector<int>(N, 0));
+
+        for (auto i = 0; i < T; i++) {
+            istrm >> current;
+            f.push_back({current, i}); // {current, i} :: Frequency
+        }
+
+        // Se ordena f por costo de uso
+        sort(f.begin(), f.end(), order_func);
+
+        graph = vector<vi>(N, vi());
+        complete_graph = vector<vi>(N, vi(N, 0));
+
+        for (auto e = 0; e < M; e++) {
+            istrm >> i;
+            istrm >> j;
+            istrm >> cost;
+
+            // Indices desde 0 hasta N-1
+            i--;
+            j--;
+
+            cost_conflict_matrix[i][j] = cost;
+            cost_conflict_matrix[j][i] = cost;
+
+            graph[i].push_back(j);
+            graph[j].push_back(i);
+
+            complete_graph[i][j] = 1;
+            complete_graph[j][i] = 1;
+        }
+
+        grasp().show_solution();
     }
-
-    // Se ordena f por costo de uso
-    sort (f.begin(), f.end(), order_func);
-
-    graph = vector<vi>(N, vi());
-    complete_graph = vector<vi>(N, vi(N, 0));
-
-    for(auto e = 0; e < M; e++) {
-        cin >> i;
-        cin >> j;
-        cin >> cost;
-
-        // Indices desde 0 hasta N-1
-        i--;
-        j--;
-
-        cost_conflict_matrix[i][j] = cost;
-        cost_conflict_matrix[j][i] = cost;
-
-        graph[i].push_back(j);
-        graph[j].push_back(i);
-
-        complete_graph[i][j] = 1;
-        complete_graph[j][i] = 1;
-    }
-
-    grasp().show_solution();
 
     return 0;
 }
