@@ -59,8 +59,7 @@ Solution::Solution() {
 }
 
 void Solution::update_frequencies() {
-    //TODO: optimizar
-    y = vi(y.size(), 0);
+    y = vi(T,0);
     for (int assing : assings) { y[assing] = 1; }
 }
 
@@ -82,11 +81,8 @@ int Solution::loss_for_collision(){
 
 int Solution::cost_of_frequencies() {
     int res = 0;
-    for(int i = 0; i < T; i++) {
-        if(y[i] == 1) {
-            res += f[i].cost_of_use;
-        }
-    }
+    for(Frequency freq : f) { if(y[freq.number_id]) res += freq.cost_of_use; }
+
     return res;
 }
 
@@ -161,14 +157,14 @@ Solution local_search(Solution sol) {
     for(int i = 0; i < N; i ++) {
         for(int f = 0; f < T; f++) {
             int old_freq = sol.assings[i];
-            int old_cost = sol.functional();
             if(old_freq != f) {
+                int old_cost = sol.functional();
                 sol.assings[i] = f;
                 sol.update_frequencies();
 
                 if(old_cost < sol.functional()) {
                     sol.assings[i] = old_freq;
-                    sol.y[old_freq] = 1;
+                    sol.update_frequencies();
                 }
             }
         }
