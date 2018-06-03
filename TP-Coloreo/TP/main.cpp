@@ -1,3 +1,4 @@
+#include <vector>
 #include <iostream>
 #include <vector>
 #include <ctime>
@@ -16,11 +17,15 @@ struct Frequency {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////// Global variables ////////////////////////////////////////////
+
+vi top_sort;
+vector<bool> marks;
 int current, i, j, cost;
 int T; // numero de frecuecncias
 int N; // numero de antenas disponibles
 int M; // numero de conflictos posibbles por asignar con la misma frecuencia
-mi graph;
+mi graph; // lista de adyacencias
+mi complete_graph; // grafo completo
 vector<Frequency> f;  // indica el costo de usar la frecuencia i
 mi cost_conflict_matrix; // costo de colisiones de frecuencias para el par de antenas i, k
 
@@ -96,45 +101,60 @@ void Solution::show_solution() { // por ahora no escribe en files
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Solution greedy_solution(int seed_vertex) {
-    cout << "Seed vertex = " << seed_vertex << endl;
+void dfs(int vertice) {
+    marks[vertice] = true;
+    for (int &i : graph[vertice]) {
+        if(!marks[i]) {
+            dfs(i);
+        }
+    }
 
+    top_sort.push_back(vertice);
+}
+
+void topological_sort() {
+    marks = vector<bool>(N, false);
+    top_sort = vi();
+    for(int i = 0; i < N; i++) {
+        if(!marks[i]) {
+            dfs(i);
+        }
+    }
+}
+
+Solution greedy_solution() {
     Solution sol = Solution();
+    topological_sort();
+    for (auto vertex : top_sort){
+        Frequency last_freq_used{};
+        for(Frequency freq : f) {
+            if(sol.assings[vertex] == -1) { // si no tiene ninguna frecuencia asignada.
+                sol.assings[vertex] = freq.number_id;
+                sol.y[freq.number_id] = 1;
+                last_freq_used = freq;
+            } else {
+                int current_cost = sol.functional();
+                // sol.y[freq.number_id] = 1; // update ya lo hace
+                sol.assings[vertex] = freq.number_id;
+                sol.update_frequencies();
 
-    Frequency freq{}; // Sacar inicializacion luego
-    freq = f[0]; // Esta ordenado
-    sol.y[freq.number_id] = 1;
-    sol.assings[seed_vertex] = freq.number_id;
-
-    for(int i = 0; i < graph.size(); i++) {
-        if(sol.assings[i] == -1) { // Si el vertice actual no tiene frecuencia asignada
-            vector<Frequency> possible_frequencies = f;
-            for(int e = 0; e < graph[i].size(); e++) {
-                auto current_e = graph[i][e];
-                if(sol.assings[current_e] != -1) { // Si el vertice lindante ya posee un color
-
-                    // Se busca la frecuencia con id = sol.assings[sol.graph[i][e]] y se elimina
-                    for(int j = 0; j < possible_frequencies.size(); j++) {
-                        if(possible_frequencies[j].number_id == sol.assings[current_e]) {
-                            possible_frequencies.erase(possible_frequencies.begin() + j);
-                        }
-                    }
+                if(current_cost < sol.functional()) { // si no mejoro la anterior
+                    sol.assings[vertex] = last_freq_used.number_id;
+                    sol.update_frequencies();
+                } else { // si si mejoro el costo
+                    last_freq_used = freq;
                 }
             }
-
-            if(possible_frequencies.empty()) { // Si no puede asignar ninguna frecuencia sin repetir
-                freq = f[0];
-            } else { // Puede asignar alguna frecuencia de possible_frequencies
-                sort (possible_frequencies.begin(), possible_frequencies.end(), order_func);
-                freq = possible_frequencies[0];
-                sol.y[freq.number_id] = 1;
-            }
-
-            sol.assings[i] = freq.number_id;
         }
     }
 
     return sol;
+}
+
+
+Solution grasp_greedy_solution() {
+    //TODO
+    return greedy_solution();
 }
 
 Solution local_search(Solution sol) {
@@ -163,13 +183,10 @@ Solution grasp() {
     start_time = time(0);
     current_iteration = 0;
 
-    Solution global_solution = greedy_solution(0);
+    Solution global_solution = greedy_solution();
 
     while(!stop_criteria()) {
-        srand(static_cast<unsigned int>(time(nullptr)));
-        int seed_vertex = (rand() + current_iteration) % N;
-
-        Solution current_solution = local_search(greedy_solution(seed_vertex));
+        Solution current_solution = local_search(grasp_greedy_solution());
         if(current_solution.functional() < global_solution.functional()) {
             global_solution = current_solution;
         }
@@ -196,6 +213,7 @@ int main() {
     sort (f.begin(), f.end(), order_func);
 
     graph = vector<vi>(N, vi());
+    complete_graph = vector<vi>(N, vi(N, 0));
 
     for(auto e = 0; e < M; e++) {
         cin >> i;
@@ -211,6 +229,9 @@ int main() {
 
         graph[i].push_back(j);
         graph[j].push_back(i);
+
+        complete_graph[i][j] = 1;
+        complete_graph[j][i] = 1;
     }
 
     grasp().show_solution();
