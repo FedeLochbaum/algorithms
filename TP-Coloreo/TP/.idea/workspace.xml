@@ -27,8 +27,8 @@
       <file leaf-file-name="main.cpp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="237">
-              <caret line="285" column="64" selection-start-line="285" selection-start-column="49" selection-end-line="285" selection-end-column="64" />
+            <state relative-caret-position="338">
+              <caret line="245" column="52" lean-forward="true" selection-start-line="245" selection-start-column="52" selection-end-line="245" selection-end-column="52" />
               <folding>
                 <element signature="e#0#17#0" expanded="true" />
               </folding>
@@ -84,8 +84,8 @@
       <file leaf-file-name="miles500.colcep" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/instances/miles500.colcep">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
-              <caret line="7" column="1" lean-forward="true" selection-end-line="1246" />
+            <state relative-caret-position="306">
+              <caret line="18" column="1" lean-forward="true" selection-start-line="18" selection-start-column="1" selection-end-line="18" selection-end-column="1" />
             </state>
           </provider>
         </entry>
@@ -122,6 +122,7 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>f</find>
+      <find>K</find>
     </findStrings>
   </component>
   <component name="IdeDocumentHistory">
@@ -222,7 +223,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="86246000" />
+    <option name="totallyTimeSpent" value="91933000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1096" extended-state="6" />
@@ -590,13 +591,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/instances/miles500.colcep">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="7" column="1" lean-forward="true" selection-end-line="1246" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/instances/r250.1.colcep">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="136">
@@ -625,10 +619,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/instances/miles500.colcep">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="18" column="1" lean-forward="true" selection-start-line="18" selection-start-column="1" selection-end-line="18" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="237">
-          <caret line="285" column="64" selection-start-line="285" selection-start-column="49" selection-end-line="285" selection-end-column="64" />
+        <state relative-caret-position="338">
+          <caret line="245" column="52" lean-forward="true" selection-start-line="245" selection-start-column="52" selection-end-line="245" selection-end-column="52" />
           <folding>
             <element signature="e#0#17#0" expanded="true" />
           </folding>

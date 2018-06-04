@@ -143,13 +143,15 @@ vi Solution::cost_of_possibles(vpi possibles) {
 
 vpi Solution::get_bests_elements(vpi possibles, vi c, pi range) {
     vpi res = vpi();
+
     for(int i = 0; i < possibles.size(); i++) {
-        if((c[i]-range.first) <= (range.second - range.first) && res.size() < K) {
+        if (res.size() == K) { break; }
+        if((c[i]-range.first) <= (range.second - range.first)) {
             res.push_back(possibles[i]);
         }
     }
 
-    res;
+    return res;
 }
 
 void Solution::show_solution() { // por ahora no escribe en files
@@ -233,21 +235,20 @@ Solution greedy_randomized_construction() {
     //TODO: Solucion
     Solution sol = Solution();
     vpi possibles = C; // copia de C, todas las posibles asignaciones de la instancia
-    // el costo incremental es el costo de usar la frecuencia si nadie la uso
     while(!sol.is_complete()) {
-        vi c = sol.cost_of_possibles(possibles);
-        //TODO: DEBUGEAR ACA
+        vi c = sol.cost_of_possibles(possibles); // c[i] indica el costo incremental de aplicar la asignacion possibles[i]
         auto max_min = std::minmax_element(c.begin(), c.end());
         int c_min = *max_min.first; // minimo costo de usar las soluciones parciales
         int c_max = *max_min.second; // maximo costo de usar las soluciones parciales
 
-        vpi RCL = sol.get_bests_elements(possibles, c, {c_min, c_min + a*(c_max - c_min)}); // Devuelve un vector de pares de asignaciones (vertice, color) con longitud como maximo K
-        pi current_assign = RCL[rand() % RCL.size()]; // Selecciona  un elemento aleatorio de RCL
-
+        auto RCL = sol.get_bests_elements(possibles, c, {c_min, c_min + a*(c_max - c_min)}); // Devuelve un vector de pares de asignaciones (vertice, color) con longitud como maximo K
+        int rand_pos = rand() % RCL.size();
+//        cout << "rand_pos = " << rand_pos << endl;
+        pi current_assign = RCL[rand_pos]; // Selecciona  un elemento aleatorio de RCL
         sol.assings[current_assign.first] = current_assign.second; // Asigna al vertice current_assign.first la frecuencia current_assign.second
         sol.y[current_assign.second] = 1;
 
-        sol.remove_assigns_of(possibles, current_assign.first); // Elimina todas aquellas posibles asignaciones al vertice current_assign.first
+        possibles = sol.remove_assigns_of(possibles, current_assign.first); // Elimina todas aquellas posibles asignaciones al vertice current_assign.first
     }
 
     return  sol;
@@ -283,7 +284,7 @@ Solution grasp() {
     Solution global_solution = greedy_solution();
 
     while(!stop_criteria()) {
-        Solution current_solution = local_search(greedy_solution()); // greedy_randomized_construction()
+        Solution current_solution = local_search(greedy_randomized_construction()); // greedy_solution()
         if(current_solution.functional() < global_solution.functional()) {
             global_solution = current_solution;
         }
@@ -294,7 +295,7 @@ Solution grasp() {
 }
 
 int main() {
-    std::string filename = R"(..\instances\input_example.txt)";
+    std::string filename = R"(..\instances\miles500.colcep)";
     std::ifstream istrm(filename);
 
     if(istrm.is_open()) {
