@@ -7,6 +7,7 @@
 
 using namespace std;
 
+typedef vector<pair<int, int>> vpi;
 typedef vector<int> vi;
 typedef vector<vi> mi;
 
@@ -29,6 +30,12 @@ mi graph; // lista de adyacencias
 mi complete_graph; // grafo completo
 vector<Frequency> f;  // indica el costo de usar la frecuencia i
 mi cost_conflict_matrix; // costo de colisiones de frecuencias para el par de antenas i, k
+
+
+///////////////////////////////////////////// Global variables for greedy randomized construction //////////
+vpi C; // Vector de pares de todas las posibles asignacinoes
+int a = 0; // Con a = 0 se vuelve un algoritmo completamente greedy, mientras que con a = 1 se vuelve una estrategia aleatoria
+int K = 5; // Cantidad de elementos maximo de CRL
 
 ////////////////////////////////////////////// Stop Criteria ///////////////////////////////////////////////
 int maximum_iterations = 1000;
@@ -119,9 +126,21 @@ void topological_sort() {
     }
 }
 
+void initialize_all_possible_assignments() { // Inicializa C
+    topological_sort();
+
+    C = vpi(); // Siempre va a tener dimension N*T
+
+    for (auto vertex : top_sort){
+        for (int i = 0; i < f.size(); i++) {
+            C.push_back({vertex, i});
+        }
+    }
+
+}
+
 Solution greedy_solution() {
     Solution sol = Solution();
-    topological_sort();
     for (auto vertex : top_sort){
         Frequency last_freq_used{};
         for(Frequency freq : f) {
@@ -150,8 +169,34 @@ Solution greedy_solution() {
 
 
 Solution greedy_randomized_construction() {
-    //TODO
-    return greedy_solution();
+    //TODO: Esquema de greedy_randomized_construction
+    // Definir C conjunto total de posibles asignaciones  N * T
+    // Definir RCL conjunto de mejores K posibles asignaciones, restringida por K y ordenada por calidad
+    // La calidad se puede restringir de acuerdo a: C(e) inlcuido en {C^{min}, C^{min} + a(C^{max} - C^{min})}
+    // Con a = 0 se vuelve un algoritmo completamente greedy, mientras que con a = 1 se vuelve una estrategia aleatoria.
+    // Se selecciona aleatoriamente un elemento de RCL y se usa como solucion.
+    // Se actualiza RCL recreandolas, donde se eliminan todas las posibles convinaciones con el vertice asignado
+
+    //TODO: Solucion
+    Solution sol = Solution();
+    vpi possibles = C; // copia de C, todas las posibles asignaciones de la instancia
+    // el costo incremental es el costo de usar la frecuencia si nadie la uso
+//    while(!sol.is_complete()) {
+//        int c_min = 0; // minimo costo de usar las soluciones parciales
+//        int c_max = 0; // maximo costo de usar las soluciones parciales
+//
+//        vpi RCL = get_bests_elements({c_min, c_min + a*(c_max - c_min)}); // Devuelve un vector de pares de asignaciones (vertice, color) con longitud como maximo K
+//        pair<int, int> current_assign = RCL[rand() % RCL.size()]; // Selecciona  un elemento aleatorio de RCL
+//
+//        sol.assings[current_assign.first] = current_assign.second; // Asigna al vertice current_assign.first la frecuencia current_assign.second
+//        sol.y[current_assign.second] = 1;
+//
+//        remove_assigns_of(possibles, current_assign.first); // Elimina todas aquellas posibles asignaciones al vertice current_assign.first
+//    }
+//
+//
+//    return  sol;
+      return greedy_solution();
 }
 
 Solution local_search(Solution sol) {
@@ -177,6 +222,7 @@ Solution local_search(Solution sol) {
 bool stop_criteria() { return current_iteration >= maximum_iterations || time(0) >= start_time + maximum_time; }
 
 Solution grasp() {
+    initialize_all_possible_assignments();
     start_time = time(0);
     current_iteration = 0;
 
