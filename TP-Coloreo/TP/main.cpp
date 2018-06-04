@@ -149,7 +149,7 @@ Solution greedy_solution() {
 }
 
 
-Solution grasp_greedy_solution() {
+Solution greedy_randomized_construction() {
     //TODO
     return greedy_solution();
 }
@@ -183,7 +183,7 @@ Solution grasp() {
     Solution global_solution = greedy_solution();
 
     while(!stop_criteria()) {
-        Solution current_solution = local_search(grasp_greedy_solution());
+        Solution current_solution = local_search(greedy_randomized_construction());
         if(current_solution.functional() < global_solution.functional()) {
             global_solution = current_solution;
         }
@@ -194,7 +194,7 @@ Solution grasp() {
 }
 
 int main() {
-    std::string filename = R"(..\instances\miles250.colcep)";
+    std::string filename = R"(..\instances\input_example.txt)";
     std::ifstream istrm(filename);
 
     if(istrm.is_open()) {
