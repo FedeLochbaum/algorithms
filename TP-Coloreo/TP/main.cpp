@@ -36,8 +36,8 @@ mi cost_conflict_matrix; // costo de colisiones de frecuencias para el par de an
 
 ///////////////////////////////////////////// Global variables for greedy randomized construction //////////
 vpi C; // Vector de pares de todas las posibles asignacinoes
-int a = 0; // Con a = 0 se vuelve un algoritmo completamente greedy, mientras que con a = 1 se vuelve una estrategia aleatoria
-int K = 5; // Cantidad de elementos maximo de CRL
+double a = 0.4; // Con a = 0 se vuelve un algoritmo completamente greedy, mientras que con a = 1 se vuelve una estrategia aleatoria
+int K = 4; // Cantidad de elementos maximo de CRL
 
 ////////////////////////////////////////////// Stop Criteria ///////////////////////////////////////////////
 int maximum_iterations = 1000;
@@ -192,7 +192,6 @@ void initialize_all_possible_assignments() { // Inicializa C
             C.push_back({vertex, i});
         }
     }
-
 }
 
 Solution greedy_solution() {
@@ -295,7 +294,7 @@ Solution grasp() {
 }
 
 int main() {
-    std::string filename = R"(..\instances\miles500.colcep)";
+    std::string filename = R"(..\instances\r250.1.colcep)";
     std::ifstream istrm(filename);
 
     if(istrm.is_open()) {
