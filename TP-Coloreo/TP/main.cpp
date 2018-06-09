@@ -38,6 +38,7 @@ mi cost_conflict_matrix; // costo de colisiones de frecuencias para el par de an
 vpi C; // Vector de pares de todas las posibles asignacinoes
 double a = 0.4; // Con a = 0 se vuelve un algoritmo completamente greedy, mientras que con a = 1 se vuelve una estrategia aleatoria
 int K = 4; // Cantidad de elementos maximo de CRL
+unsigned int seed = 23;
 
 ////////////////////////////////////////////// Stop Criteria ///////////////////////////////////////////////
 int maximum_iterations = 1000;
@@ -299,6 +300,7 @@ Solution grasp() {
 int main() {
     std::string filename = R"(..\instances\input_example.colcep)";
     std::ifstream istrm(filename);
+    srand (seed);
 
     if(istrm.is_open()) {
         istrm >> N;
