@@ -242,7 +242,6 @@ Solution greedy_randomized_construction() {
 
         auto RCL = sol.get_bests_elements(possibles, c, {c_min, c_min + a*(c_max - c_min)}); // Devuelve un vector de pares de asignaciones (vertice, color) con longitud como maximo K
         int rand_pos = rand() % RCL.size();
-//        cout << "rand_pos = " << rand_pos << endl;
         pi current_assign = RCL[rand_pos]; // Selecciona  un elemento aleatorio de RCL
         sol.assings[current_assign.first] = current_assign.second; // Asigna al vertice current_assign.first la frecuencia current_assign.second
         sol.y[current_assign.second] = 1;
@@ -281,11 +280,14 @@ Solution grasp() {
     current_iteration = 0;
 
     Solution global_solution = greedy_solution();
+    int global_cost = global_solution.functional();
 
     while(!stop_criteria()) {
-        Solution current_solution = local_search(greedy_randomized_construction()); // greedy_solution()
-        if(current_solution.functional() < global_solution.functional()) {
+        Solution current_solution = local_search(greedy_randomized_construction());
+        int current_cost = current_solution.functional();
+        if(current_cost < global_cost) {
             global_solution = current_solution;
+            global_cost = current_cost;
         }
         current_iteration++;
     }
@@ -294,7 +296,7 @@ Solution grasp() {
 }
 
 int main() {
-    std::string filename = R"(..\instances\r250.1.colcep)";
+    std::string filename = R"(..\instances\input_example.colcep)";
     std::ifstream istrm(filename);
 
     if(istrm.is_open()) {
