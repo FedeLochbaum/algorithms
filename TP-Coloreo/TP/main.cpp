@@ -128,12 +128,14 @@ vpi Solution::remove_assigns_of(vpi &possibles, int vertex) {
 vi Solution::cost_of_possibles(vpi &possibles) {
     vi res = vi();
 
+    int current_cost = functional();
+
     for(auto pair : possibles) {
         int current_assing = assings[pair.first];
         assings[pair.first] = pair.second;
         update_frequencies();
 
-        res.push_back(functional());
+        res.push_back(functional() - current_cost);
 
         assings[pair.first] = current_assing;
         update_frequencies();
@@ -255,16 +257,18 @@ Solution greedy_randomized_construction() {
 
 Solution local_search(Solution &sol) {
     for(int i = 0; i < N; i ++) {
-        for(int f = 0; f < T; f++) {
-            int old_freq = sol.assings[i];
-            if(old_freq != f) {
-                int old_cost = sol.functional();
-                sol.assings[i] = f;
-                sol.update_frequencies();
-
-                if(old_cost < sol.functional()) {
-                    sol.assings[i] = old_freq;
+        if(!graph[i].empty()) { // Si el vertice tiene vecinos, sino no, no tiene sentido cambiarle el color
+            for(int f = 0; f < T; f++) {
+                int old_freq = sol.assings[i];
+                if(old_freq != f) {
+                    int old_cost = sol.functional();
+                    sol.assings[i] = f;
                     sol.update_frequencies();
+
+                    if(old_cost < sol.functional()) {
+                        sol.assings[i] = old_freq;
+                        sol.update_frequencies();
+                    }
                 }
             }
         }
