@@ -252,7 +252,7 @@ Solution greedy_randomized_construction() {
     return  sol;
 }
 
-Solution local_search(Solution sol) {
+Solution local_search(Solution &sol) {
     for(int i = 0; i < N; i ++) {
         for(int f = 0; f < T; f++) {
             int old_freq = sol.assings[i];
@@ -283,7 +283,8 @@ Solution grasp() {
     int global_cost = global_solution.functional();
 
     while(!stop_criteria()) {
-        Solution current_solution = local_search(greedy_randomized_construction());
+        Solution current_solution = greedy_randomized_construction();
+        current_solution = local_search(current_solution);
         int current_cost = current_solution.functional();
         if(current_cost < global_cost) {
             global_solution = current_solution;
