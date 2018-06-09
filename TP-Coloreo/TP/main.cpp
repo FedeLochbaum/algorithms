@@ -64,9 +64,9 @@ struct Solution {
     void show_solution();
     void update_frequencies();
     bool is_complete();
-    vpi remove_assigns_of(vpi possibles, int vertex);
-    vi cost_of_possibles(vpi possibles);
-    vpi get_bests_elements(vpi possibles, vi c, pi range);
+    vpi remove_assigns_of(vpi &possibles, int vertex);
+    vi cost_of_possibles(vpi &possibles);
+    vpi get_bests_elements(vpi &possibles, vi &c, pi range);
 };
 
 Solution::Solution() {
@@ -113,7 +113,7 @@ bool Solution::is_complete(){
     return true;
 }
 
-vpi Solution::remove_assigns_of(vpi possibles, int vertex) {
+vpi Solution::remove_assigns_of(vpi &possibles, int vertex) {
     vpi res = vpi();
     for(auto pair : possibles) {
         if(pair.first != vertex) {
@@ -124,7 +124,7 @@ vpi Solution::remove_assigns_of(vpi possibles, int vertex) {
     return res;
 }
 
-vi Solution::cost_of_possibles(vpi possibles) {
+vi Solution::cost_of_possibles(vpi &possibles) {
     vi res = vi();
 
     for(auto pair : possibles) {
@@ -141,7 +141,7 @@ vi Solution::cost_of_possibles(vpi possibles) {
     return res;
 }
 
-vpi Solution::get_bests_elements(vpi possibles, vi c, pi range) {
+vpi Solution::get_bests_elements(vpi &possibles, vi &c, pi range) {
     vpi res = vpi();
 
     for(int i = 0; i < possibles.size(); i++) {
@@ -161,7 +161,7 @@ void Solution::show_solution() { // por ahora no escribe en files
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void dfs(int vertice) {
+void dfs(int &vertice) {
     marks[vertice] = true;
     for (int &i : graph[vertice]) {
         if(!marks[i]) {
