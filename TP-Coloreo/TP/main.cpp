@@ -36,32 +36,20 @@ mi cost_conflict_matrix; // costo de colisiones de frecuencias para el par de an
 
 ///////////////////////////////////////////// Global variables for greedy randomized construction //////////
 vpi C; // Vector de pares de todas las posibles asignacinoes
-int K = 4; // Cantidad de elementos maximo de CRL
+double a = 0; // Con a = 0 se vuelve un algoritmo completamente greedy, mientras que con a = 1 se vuelve una estrategia aleatoria
+int K = 8; // Cantidad de elementos maximo de CRL
 unsigned int seed = 23;
 
 ////////////////////////////////////////////// Stop Criteria ///////////////////////////////////////////////
 int maximum_iterations = 1000;
 int current_iteration;
-int maximum_time = 300; // 5 minutes
+int maximum_time = 900; // 15 minutos
 time_t start_time;
 
 ///////////////////////////////////////////// Order function //////////////////////////////////////////////
 bool order_func (Frequency i, Frequency j) { return (i.cost_of_use < j.cost_of_use); }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-template<typename T>
-std::vector<T> take_elements(std::vector<T> &v, int K) {
-    std::vector<T> vec;
-    auto begin = v.begin();
-    auto end = v.end();
-
-    if(v.size() > K) { end = begin + K; }
-
-    std::copy(begin, end, std::back_inserter(vec));
-    return vec;
-}
 
 //////////////////////////////////////////////// Solution /////////////////////////////////////////////////
 struct Solution {
@@ -147,10 +135,23 @@ vpi Solution::remove_assigns_of(vpi &possibles, int vertex) {
 vpi Solution::get_RCL(vpi &possibles) {
     order_possibles(possibles); // Ordeno de los pares por orden incremental de asignacion
 
-    return take_elements(possibles, K);
+    int c_min = cost_of_assign(possibles[0]); // minimo costo de usar las soluciones parciales
+    int c_max =cost_of_assign(possibles[possibles.size()-1]); // maximo costo de usar las soluciones parciales
+    pi range = {c_min, c_min + a*(c_max - c_min)};
+
+    vpi res = vpi();
+
+    for(auto pair : possibles) {
+        if (res.size() == K) { break; }
+        if((cost_of_assign(pair) - range.first) <= (range.second - range.first)) {
+            res.push_back(pair);
+        }
+    }
+
+    return res;
 }
 
-int Solution::cost_of_assign(pi i) {
+int Solution::cost_of_assign(pi i) { //TODO: hace demasiado lento el alogirtmo
     int res = functional();
 
     int current_assing = assings[i.first];
@@ -256,6 +257,7 @@ Solution greedy_randomized_construction() {
         possibles = sol.remove_assigns_of(possibles, current_assign.first); // Elimina todas aquellas posibles asignaciones al vertice current_assign.first
     }
 
+    cout << "Finalizo un randomized con costo: " << sol.functional() << endl;
     return  sol;
 }
 
@@ -288,12 +290,14 @@ Solution grasp() {
 
     Solution global_solution = greedy_solution();
     int global_cost = global_solution.functional();
+    cout << "Global cost: " << global_cost;
 
     while(!stop_criteria()) {
         Solution current_solution = greedy_randomized_construction();
         current_solution = local_search(current_solution);
         int current_cost = current_solution.functional();
         if(current_cost < global_cost) {
+            cout << "Nueva solucion con costo: " << current_cost << endl;
             global_solution = current_solution;
             global_cost = current_cost;
         }
@@ -304,7 +308,7 @@ Solution grasp() {
 }
 
 int main() {
-    std::string filename = R"(..\instances\input_example.colcep)";
+    std::string filename = R"(..\instances\miles500.colcep)";
     std::ifstream istrm(filename);
     srand (seed);
 
