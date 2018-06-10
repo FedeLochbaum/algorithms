@@ -138,13 +138,11 @@ vi Solution::cost_of_possibles(vpi &possibles) {
 
     for(auto pair : possibles) {
         int current_assing = assings[pair.first];
-        assings[pair.first] = pair.second;
-        update_frequencies();
+        apply_assign(pair);
 
         res.push_back(functional() - current_cost);
 
-        assings[pair.first] = current_assing;
-        update_frequencies();
+        apply_assign({pair.first, current_assing});
     }
 
     return res;
@@ -301,7 +299,7 @@ Solution grasp() {
 }
 
 int main() {
-    std::string filename = R"(..\instances\input_example.colcep)";
+    std::string filename = R"(..\instances\miles250.colcep)";
     std::ifstream istrm(filename);
     srand (seed);
 
