@@ -58,6 +58,7 @@ struct Solution {
 
     Solution();
     int functional();
+    void apply_assign(pi pair);
     int loss_for_collision();
     int cost_of_frequencies();
 
@@ -96,6 +97,11 @@ int Solution::cost_of_frequencies() {
     for(Frequency freq : f) { if(y[freq.number_id]) res += freq.cost_of_use; }
 
     return res;
+}
+
+void Solution::apply_assign(pi pair) {
+    assings[pair.first] = pair.second;
+    update_frequencies();
 }
 
 int Solution::functional() {
@@ -203,18 +209,14 @@ Solution greedy_solution() {
         Frequency last_freq_used{};
         for(Frequency freq : f) {
             if(sol.assings[vertex] == -1) { // si no tiene ninguna frecuencia asignada.
-                sol.assings[vertex] = freq.number_id;
-                sol.y[freq.number_id] = 1;
+                sol.apply_assign({vertex, freq.number_id});
                 last_freq_used = freq;
             } else {
                 int current_cost = sol.functional();
-                // sol.y[freq.number_id] = 1; // update ya lo hace
-                sol.assings[vertex] = freq.number_id;
-                sol.update_frequencies();
+                sol.apply_assign({vertex, freq.number_id});
 
                 if(current_cost < sol.functional()) { // si no mejoro la anterior
-                    sol.assings[vertex] = last_freq_used.number_id;
-                    sol.update_frequencies();
+                    sol.apply_assign({vertex, last_freq_used.number_id});
                 } else {// si si mejoro el costo
                     last_freq_used = freq;
                 }
@@ -246,8 +248,7 @@ Solution greedy_randomized_construction() {
         auto RCL = sol.get_bests_elements(possibles, c, {c_min, c_min + a*(c_max - c_min)}); // Devuelve un vector de pares de asignaciones (vertice, color) con longitud como maximo K
         int rand_pos = rand() % RCL.size();
         pi current_assign = RCL[rand_pos]; // Selecciona  un elemento aleatorio de RCL
-        sol.assings[current_assign.first] = current_assign.second; // Asigna al vertice current_assign.first la frecuencia current_assign.second
-        sol.y[current_assign.second] = 1;
+        sol.apply_assign(current_assign);
 
         possibles = sol.remove_assigns_of(possibles, current_assign.first); // Elimina todas aquellas posibles asignaciones al vertice current_assign.first
     }
@@ -262,12 +263,10 @@ Solution local_search(Solution &sol) {
                 int old_freq = sol.assings[i];
                 if(old_freq != f) {
                     int old_cost = sol.functional();
-                    sol.assings[i] = f;
-                    sol.update_frequencies();
+                    sol.apply_assign({i, f});
 
                     if(old_cost < sol.functional()) {
-                        sol.assings[i] = old_freq;
-                        sol.update_frequencies();
+                        sol.apply_assign({i, old_freq});
                     }
                 }
             }
