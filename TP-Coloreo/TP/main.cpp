@@ -36,8 +36,8 @@ mi cost_conflict_matrix; // costo de colisiones de frecuencias para el par de an
 
 ///////////////////////////////////////////// Global variables for greedy randomized construction //////////
 vpi C; // Vector de pares de todas las posibles asignacinoes
-double a = 0; // Con a = 0 se vuelve un algoritmo completamente greedy, mientras que con a = 1 se vuelve una estrategia aleatoria
-int K = 8; // Cantidad de elementos maximo de CRL
+double a = 0.5; // Con a = 0 se vuelve un algoritmo completamente greedy, mientras que con a = 1 se vuelve una estrategia aleatoria
+int K = 4; // Cantidad de elementos maximo de CRL
 unsigned int seed = 23;
 
 ////////////////////////////////////////////// Stop Criteria ///////////////////////////////////////////////
@@ -136,7 +136,7 @@ vpi Solution::get_RCL(vpi &possibles) {
     order_possibles(possibles); // Ordeno de los pares por orden incremental de asignacion
 
     int c_min = cost_of_assign(possibles[0]); // minimo costo de usar las soluciones parciales
-    int c_max =cost_of_assign(possibles[possibles.size()-1]); // maximo costo de usar las soluciones parciales
+    int c_max = cost_of_assign(possibles[possibles.size()-1]); // maximo costo de usar las soluciones parciales
     pi range = {c_min, c_min + a*(c_max - c_min)};
 
     vpi res = vpi();
@@ -308,7 +308,7 @@ Solution grasp() {
 }
 
 int main() {
-    std::string filename = R"(..\instances\miles500.colcep)";
+    std::string filename = R"(..\instances\input_example.colcep)";
     std::ifstream istrm(filename);
     srand (seed);
 
