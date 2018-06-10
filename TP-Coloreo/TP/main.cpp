@@ -36,7 +36,6 @@ mi cost_conflict_matrix; // costo de colisiones de frecuencias para el par de an
 
 ///////////////////////////////////////////// Global variables for greedy randomized construction //////////
 vpi C; // Vector de pares de todas las posibles asignacinoes
-double a = 0.4; // Con a = 0 se vuelve un algoritmo completamente greedy, mientras que con a = 1 se vuelve una estrategia aleatoria
 int K = 4; // Cantidad de elementos maximo de CRL
 unsigned int seed = 23;
 
@@ -50,6 +49,19 @@ time_t start_time;
 bool order_func (Frequency i, Frequency j) { return (i.cost_of_use < j.cost_of_use); }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+template<typename T>
+std::vector<T> take_elements(std::vector<T> &v, int K) {
+    std::vector<T> vec;
+    auto begin = v.begin();
+    auto end = v.end();
+
+    if(v.size() > K) { end = begin + K; }
+
+    std::copy(begin, end, std::back_inserter(vec));
+    return vec;
+}
 
 //////////////////////////////////////////////// Solution /////////////////////////////////////////////////
 struct Solution {
@@ -67,8 +79,10 @@ struct Solution {
     void update_frequencies();
     bool is_complete();
     vpi remove_assigns_of(vpi &possibles, int vertex);
-    vi cost_of_possibles(vpi &possibles);
-    vpi get_bests_elements(vpi &possibles, vi &c, pi range);
+    void order_possibles(vpi &possibles);
+    int cost_of_assign(pi i);
+    bool order_assigns(pi &a, pi &b);
+    vpi get_RCL(vpi &possibles);
 };
 
 Solution::Solution() {
@@ -122,43 +136,39 @@ bool Solution::is_complete(){
 
 vpi Solution::remove_assigns_of(vpi &possibles, int vertex) {
     vpi res = vpi();
-    for(auto pair : possibles) {
-        if(pair.first != vertex) {
-            res.push_back(pair);
-        }
-    }
+
+    std::copy_if (possibles.begin(), possibles.end(), std::back_inserter(res), [vertex](pi pair){
+        return pair.first != vertex;
+    } );
 
     return res;
 }
 
-vi Solution::cost_of_possibles(vpi &possibles) {
-    vi res = vi();
+vpi Solution::get_RCL(vpi &possibles) {
+    order_possibles(possibles); // Ordeno de los pares por orden incremental de asignacion
 
-    int current_cost = functional();
+    return take_elements(possibles, K);
+}
 
-    for(auto pair : possibles) {
-        int current_assing = assings[pair.first];
-        apply_assign(pair);
+int Solution::cost_of_assign(pi i) {
+    int res = functional();
 
-        res.push_back(functional() - current_cost);
+    int current_assing = assings[i.first];
+    apply_assign(i);
 
-        apply_assign({pair.first, current_assing});
-    }
+    res = functional() - res;
+
+    assings[i.first] = current_assing;
+    apply_assign({i.first, current_assing});
 
     return res;
 }
 
-vpi Solution::get_bests_elements(vpi &possibles, vi &c, pi range) {
-    vpi res = vpi();
+bool Solution::order_assigns(pi &a, pi &b) { return cost_of_assign(a) < cost_of_assign(b); }
 
-    for(int i = 0; i < possibles.size(); i++) {
-        if (res.size() == K) { break; }
-        if((c[i]-range.first) <= (range.second - range.first)) {
-            res.push_back(possibles[i]);
-        }
-    }
-
-    return res;
+void Solution::order_possibles(vpi &possibles) {
+    auto sol = *this;
+    sort(possibles.begin(), possibles.end(), [&sol](pi &a, pi &b) { return sol.order_assigns(a, b); });
 }
 
 void Solution::show_solution() { // por ahora no escribe en files
@@ -238,12 +248,7 @@ Solution greedy_randomized_construction() {
     Solution sol = Solution();
     vpi possibles = C; // copia de C, todas las posibles asignaciones de la instancia
     while(!sol.is_complete()) {
-        vi c = sol.cost_of_possibles(possibles); // c[i] indica el costo incremental de aplicar la asignacion possibles[i]
-        auto max_min = std::minmax_element(c.begin(), c.end());
-        int c_min = *max_min.first; // minimo costo de usar las soluciones parciales
-        int c_max = *max_min.second; // maximo costo de usar las soluciones parciales
-
-        auto RCL = sol.get_bests_elements(possibles, c, {c_min, c_min + a*(c_max - c_min)}); // Devuelve un vector de pares de asignaciones (vertice, color) con longitud como maximo K
+        auto RCL = sol.get_RCL(possibles); // ordena possibles por costo incremental y devuelve los primeros K pares de asignaciones
         int rand_pos = rand() % RCL.size();
         pi current_assign = RCL[rand_pos]; // Selecciona  un elemento aleatorio de RCL
         sol.apply_assign(current_assign);
@@ -274,7 +279,7 @@ Solution local_search(Solution &sol) {
     return sol;
 }
 
-bool stop_criteria() { return current_iteration >= maximum_iterations || time(0) >= start_time + maximum_time; }
+bool stop_criteria() { return current_iteration >= maximum_iterations || time(nullptr) >= start_time + maximum_time; }
 
 Solution grasp() {
     initialize_all_possible_assignments();
@@ -299,7 +304,7 @@ Solution grasp() {
 }
 
 int main() {
-    std::string filename = R"(..\instances\miles250.colcep)";
+    std::string filename = R"(..\instances\input_example.colcep)";
     std::ifstream istrm(filename);
     srand (seed);
 
