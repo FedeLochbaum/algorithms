@@ -37,14 +37,14 @@ mi cost_conflict_matrix; // costo de colisiones de frecuencias para el par de an
 
 ///////////////////////////////////////////// Global variables for greedy randomized construction //////////
 vpi C; // Vector de pares de todas las posibles asignacinoes
-double a = 0.5; // Con a = 0 se vuelve un algoritmo completamente greedy, mientras que con a = 1 se vuelve una estrategia aleatoria
+double a = 0; // Con a = 0 se vuelve un algoritmo completamente greedy, mientras que con a = 1 se vuelve una estrategia aleatoria
 int K = 4; // Cantidad de elementos maximo de CRL
 unsigned int seed = 23;
 
 ////////////////////////////////////////////// Stop Criteria ///////////////////////////////////////////////
 int maximum_iterations = 1000;
 int current_iteration;
-int maximum_time = 900; // 15 minutos
+int maximum_time = 300; // 15 minutos
 time_t start_time;
 
 ///////////////////////////////////////////// Order function //////////////////////////////////////////////
@@ -317,7 +317,6 @@ Solution grasp() {
             global_solution = current_solution;
             global_cost = current_cost;
         }
-        cout << "Una iteracion" << endl;
         current_iteration++;
     }
 
