@@ -65,7 +65,7 @@ struct Solution {
 
     // AUX
     void show_solution();
-    void update_frequencies();
+    void update_frequencies(pi &pair);
     bool is_complete();
     vpi remove_assigns_of(vpi &possibles, int vertex);
     void order_possibles(vpi &possibles);
@@ -105,17 +105,21 @@ int Solution::cost_of_frequencies() {
 }
 
 void Solution::apply_assign(pi pair) {
+    update_frequencies(pair);
     assings[pair.first] = pair.second;
-    update_frequencies();
+
 }
 
 int Solution::functional() {
     return cost_of_frequencies() + loss_for_collision();
 }
 
-void Solution::update_frequencies() {
-    y = vi(T,0);
-    for (int assing : assings) { y[assing] = 1; }
+void Solution::update_frequencies(pi &pair) {
+    int old_assing = assings[pair.first];
+    if(old_assing != -1 && count (assings.begin(), assings.end(), old_assing) == 1) { // si solo este vertice lo usaba esta frecuencia
+        y[old_assing] = 0;
+    }
+    y[pair.second] = 1;
 }
 
 bool Solution::is_complete(){
@@ -241,19 +245,12 @@ void initialize_all_possible_assignments() { // Inicializa C
 Solution greedy_solution() {
     Solution sol = Solution();
     for (auto vertex : top_sort){
-        Frequency last_freq_used{};
         for(Frequency freq : f) {
             if(sol.assings[vertex] == -1) { // si no tiene ninguna frecuencia asignada.
                 sol.apply_assign({vertex, freq.number_id});
-                last_freq_used = freq;
             } else {
-                int current_cost = sol.functional();
-                sol.apply_assign({vertex, freq.number_id});
-
-                if(current_cost < sol.functional()) { // si no mejoro la anterior
-                    sol.apply_assign({vertex, last_freq_used.number_id});
-                } else {// si si mejoro el costo
-                    last_freq_used = freq;
+                if(sol.cost_of_assign({vertex, freq.number_id}) < 0) {
+                    sol.apply_assign({vertex, freq.number_id});
                 }
             }
         }
