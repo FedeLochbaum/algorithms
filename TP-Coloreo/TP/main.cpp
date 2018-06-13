@@ -21,7 +21,6 @@ struct Frequency {
 
 ////////////////////////////////////////////// Global variables ////////////////////////////////////////////
 
-int inf = numeric_limits<int>::max();
 vi top_sort;
 vector<bool> marks;
 int current, i, j, cost;
@@ -29,7 +28,6 @@ int T; // numero de frecuecncias
 int N; // numero de antenas disponibles
 int M; // numero de conflictos posibbles por asignar con la misma frecuencia
 mi graph; // lista de adyacencias
-mi complete_graph; // grafo completo
 vector<Frequency> f; // vector de Frequency ordenado por costo
 vi cost_of_freqs; // indica el costo de usar la frecuencia i
 mi cost_conflict_matrix; // costo de colisiones de frecuencias para el par de antenas i, k
@@ -113,6 +111,7 @@ vpi Solution::remove_assigns_of(vpi &possibles, int vertex) {
 }
 
 vpi Solution::get_RCL(vpi &possibles) {
+
     order_possibles(possibles); // Ordeno de los pares por orden incremental de asignacion
 
     int c_min = cost_of_assign(possibles[0]); // minimo costo de usar las soluciones parciales
@@ -317,7 +316,6 @@ int main() {
         sort(f.begin(), f.end(), order_func);
 
         graph = vector<vi>(N, vi());
-        complete_graph = vector<vi>(N, vi(N, 0));
 
         for (auto e = 0; e < M; e++) {
             istrm >> i;
@@ -333,9 +331,6 @@ int main() {
 
             graph[i].push_back(j);
             graph[j].push_back(i);
-
-            complete_graph[i][j] = 1;
-            complete_graph[j][i] = 1;
         }
 
         grasp().show_solution();
