@@ -280,15 +280,12 @@ Solution grasp() {
     current_iteration = 0;
 
     Solution global_solution = greedy_solution();
-    int global_cost = global_solution.cost;
 
     while(!stop_criteria()) {
         Solution current_solution = greedy_randomized_construction();
         current_solution = local_search(current_solution);
-        int current_cost = current_solution.cost;
-        if(current_cost < global_cost) {
+        if(current_solution.cost < global_solution.cost) {
             global_solution = current_solution;
-            global_cost = current_cost;
         }
         current_iteration++;
     }
@@ -297,7 +294,7 @@ Solution grasp() {
 }
 
 int main() {
-    std::string filename = R"(..\instances\miles500.colcep)";
+    std::string filename = R"(..\instances\input_example.colcep)";
     std::ifstream istrm(filename);
     srand (seed);
 
