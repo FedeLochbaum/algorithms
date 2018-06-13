@@ -37,14 +37,14 @@ mi cost_conflict_matrix; // costo de colisiones de frecuencias para el par de an
 
 ///////////////////////////////////////////// Global variables for greedy randomized construction //////////
 vpi C; // Vector de pares de todas las posibles asignacinoes
-double a = 0; // Con a = 0 se vuelve un algoritmo completamente greedy, mientras que con a = 1 se vuelve una estrategia aleatoria
+double a = 0.5; // Con a = 0 se vuelve un algoritmo completamente greedy, mientras que con a = 1 se vuelve una estrategia aleatoria
 int K = 4; // Cantidad de elementos maximo de CRL
 unsigned int seed = 23;
 
 ////////////////////////////////////////////// Stop Criteria ///////////////////////////////////////////////
 int maximum_iterations = 1000;
 int current_iteration;
-int maximum_time = 300; // 15 minutos
+int maximum_time = 300; // 5 minutos
 time_t start_time;
 
 ///////////////////////////////////////////// Order function //////////////////////////////////////////////
@@ -56,12 +56,10 @@ bool order_func (Frequency i, Frequency j) { return (i.cost_of_use < j.cost_of_u
 struct Solution {
     vi y; // 0 o 1 si la frecuencia con id i esta usada
     vi assings; // assings[i] indica la frecuencia asignada al vertice i.
+    int cost;
 
     Solution();
-    int functional();
     void apply_assign(pi pair);
-    int loss_for_collision();
-    int cost_of_frequencies();
 
     // AUX
     void show_solution();
@@ -79,40 +77,15 @@ struct Solution {
 Solution::Solution() {
     y = vi(T,0);
     assings = vi(N, -1);
-}
-
-int Solution::loss_for_collision(){
-    auto copy_matrix = cost_conflict_matrix;
-    int res = 0;
-
-    for(int i = 0; i < copy_matrix.size(); i ++) {
-        for(int k = 0; k < copy_matrix[i].size(); k++) {
-            if(assings[i] == assings[k] && assings[i] != -1) {
-                res += copy_matrix[i][k];
-                copy_matrix[i][k] = 0;
-                copy_matrix[k][i] = 0;
-            }
-        }
-    }
-    return res;
-}
-
-int Solution::cost_of_frequencies() {
-    int res = 0;
-    for(Frequency freq : f) { if(y[freq.number_id]) res += freq.cost_of_use; }
-
-    return res;
+    cost = 0;
 }
 
 void Solution::apply_assign(pi pair) {
+    cost += cost_of_assign(pair);
     update_frequencies(pair);
     assings[pair.first] = pair.second;
-
 }
 
-int Solution::functional() {
-    return cost_of_frequencies() + loss_for_collision();
-}
 
 void Solution::update_frequencies(pi &pair) {
     int old_assing = assings[pair.first];
@@ -159,35 +132,35 @@ vpi Solution::get_RCL(vpi &possibles) {
 }
 
 int Solution::cost_of_current_assign(int &vertex, int &new_assign) {
-    int cost_of_current_collision = 0;
-    if( assings[vertex] != -1) {
-        for(auto u : graph[vertex]) {
-            if(assings[u] == assings[vertex]) {
-                cost_of_current_collision += cost_conflict_matrix[vertex][u];
+    int current_cost = 0;
+    if( assings[vertex] != -1) { // si la anterior asignacion era -1, no generaba ningun costo tal asignacion
+        if(count (assings.begin(), assings.end(), assings[vertex]) == 1) { // si la frecuencia solo estaba usada por este vertice
+            current_cost += cost_of_freqs[assings[vertex]];
+        } else {
+            for(auto u : graph[vertex]) {
+                if(assings[u] == assings[vertex]) {
+                    current_cost += cost_conflict_matrix[u][vertex];
+                }
             }
         }
-
-        if(count (assings.begin(), assings.end(), assings[vertex]) == 1) { // si la frecuencia solo estaba usada por este vertice
-            cost_of_current_collision += cost_of_freqs[assings[vertex]];
-        }
     }
-    return cost_of_current_collision;
+    return current_cost;
 }
 
 int Solution::cost_of_new_assign(int &vertex, int &new_assign) {
-    int cost_of_new_collision = 0;
+    int current_cost = 0;
     if (new_assign != -1) {
-        for(auto u : graph[vertex]) {
-            if(assings[u] == new_assign) {
-                cost_of_new_collision += cost_conflict_matrix[vertex][u];
+        if(count (assings.begin(), assings.end(), new_assign) == 0) { // si la frecuencia no esta usada
+            current_cost += cost_of_freqs[new_assign];
+        } else {
+            for(auto u : graph[vertex]) {
+                if(assings[u] == new_assign) {
+                    current_cost += cost_conflict_matrix[u][vertex];
+                }
             }
         }
-
-        if(count (assings.begin(), assings.end(), new_assign) == 0) { // si la frecuencia no esta usada
-            cost_of_new_collision += cost_of_freqs[new_assign];
-        }
     }
-    return cost_of_new_collision;
+    return current_cost;
 }
 
 int Solution::cost_of_assign(pi i) {
@@ -204,7 +177,7 @@ void Solution::order_possibles(vpi &possibles) {
 
 void Solution::show_solution() { // por ahora no escribe en files
     for(auto frec_id : assings) { cout << frec_id << endl; }
-    cout << "Cost: " << functional() << endl;
+    cout << "Cost: " << cost << endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -307,12 +280,12 @@ Solution grasp() {
     current_iteration = 0;
 
     Solution global_solution = greedy_solution();
-    int global_cost = global_solution.functional();
+    int global_cost = global_solution.cost;
 
     while(!stop_criteria()) {
         Solution current_solution = greedy_randomized_construction();
         current_solution = local_search(current_solution);
-        int current_cost = current_solution.functional();
+        int current_cost = current_solution.cost;
         if(current_cost < global_cost) {
             global_solution = current_solution;
             global_cost = current_cost;
