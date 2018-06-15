@@ -21,7 +21,6 @@ struct Frequency {
 
 ////////////////////////////////////////////// Global variables ////////////////////////////////////////////
 
-int inf = numeric_limits<int>::max();
 vi top_sort;
 vector<bool> marks;
 int current, i, j, cost;
@@ -29,21 +28,21 @@ int T; // numero de frecuecncias
 int N; // numero de antenas disponibles
 int M; // numero de conflictos posibbles por asignar con la misma frecuencia
 mi graph; // lista de adyacencias
-mi complete_graph; // grafo completo
-vector<Frequency> f;  // indica el costo de usar la frecuencia i
+vector<Frequency> f; // vector de Frequency ordenado por costo
+vi cost_of_freqs; // indica el costo de usar la frecuencia i
 mi cost_conflict_matrix; // costo de colisiones de frecuencias para el par de antenas i, k
 
 
 ///////////////////////////////////////////// Global variables for greedy randomized construction //////////
 vpi C; // Vector de pares de todas las posibles asignacinoes
-double a = 0.4; // Con a = 0 se vuelve un algoritmo completamente greedy, mientras que con a = 1 se vuelve una estrategia aleatoria
+double a = 0.5; // Con a = 0 se vuelve un algoritmo completamente greedy, mientras que con a = 1 se vuelve una estrategia aleatoria
 int K = 4; // Cantidad de elementos maximo de CRL
 unsigned int seed = 23;
 
 ////////////////////////////////////////////// Stop Criteria ///////////////////////////////////////////////
 int maximum_iterations = 1000;
 int current_iteration;
-int maximum_time = 300; // 5 minutes
+int maximum_time = 300; // 5 minutos
 time_t start_time;
 
 ///////////////////////////////////////////// Order function //////////////////////////////////////////////
@@ -55,62 +54,43 @@ bool order_func (Frequency i, Frequency j) { return (i.cost_of_use < j.cost_of_u
 struct Solution {
     vi y; // 0 o 1 si la frecuencia con id i esta usada
     vi assings; // assings[i] indica la frecuencia asignada al vertice i.
+    int cost;
 
     Solution();
-    int functional();
     void apply_assign(pi pair);
-    int loss_for_collision();
-    int cost_of_frequencies();
 
     // AUX
     void show_solution();
-    void update_frequencies();
+    void update_frequencies(pi &pair);
     bool is_complete();
     vpi remove_assigns_of(vpi &possibles, int vertex);
-    vi cost_of_possibles(vpi &possibles);
-    vpi get_bests_elements(vpi &possibles, vi &c, pi range);
+    void order_possibles(vpi &possibles);
+    int cost_of_assign(pi i);
+    bool order_assigns(pi &a, pi &b);
+    vpi get_RCL(vpi &possibles);
+    int cost_of_current_assign(int &vertex, int &new_assign);
+    int cost_of_new_assign(int &vertex, int &new_assign);
 };
 
 Solution::Solution() {
     y = vi(T,0);
     assings = vi(N, -1);
-}
-
-int Solution::loss_for_collision(){
-    auto copy_matrix = cost_conflict_matrix;
-    int res = 0;
-
-    for(int i = 0; i < copy_matrix.size(); i ++) {
-        for(int k = 0; k < copy_matrix[i].size(); k++) {
-            if(assings[i] == assings[k] && assings[i] != -1) {
-                res += copy_matrix[i][k];
-                copy_matrix[i][k] = 0;
-                copy_matrix[k][i] = 0;
-            }
-        }
-    }
-    return res;
-}
-
-int Solution::cost_of_frequencies() {
-    int res = 0;
-    for(Frequency freq : f) { if(y[freq.number_id]) res += freq.cost_of_use; }
-
-    return res;
+    cost = 0;
 }
 
 void Solution::apply_assign(pi pair) {
+    cost += cost_of_assign(pair);
+    update_frequencies(pair);
     assings[pair.first] = pair.second;
-    update_frequencies();
 }
 
-int Solution::functional() {
-    return cost_of_frequencies() + loss_for_collision();
-}
 
-void Solution::update_frequencies() {
-    y = vi(T,0);
-    for (int assing : assings) { y[assing] = 1; }
+void Solution::update_frequencies(pi &pair) {
+    int old_assing = assings[pair.first];
+    if(old_assing != -1 && count (assings.begin(), assings.end(), old_assing) == 1) { // si solo este vertice lo usaba esta frecuencia
+        y[old_assing] = 0;
+    }
+    y[pair.second] = 1;
 }
 
 bool Solution::is_complete(){
@@ -122,8 +102,27 @@ bool Solution::is_complete(){
 
 vpi Solution::remove_assigns_of(vpi &possibles, int vertex) {
     vpi res = vpi();
+
+    std::copy_if (possibles.begin(), possibles.end(), std::back_inserter(res), [vertex](pi pair){
+        return pair.first != vertex;
+    } );
+
+    return res;
+}
+
+vpi Solution::get_RCL(vpi &possibles) {
+
+    order_possibles(possibles); // Ordeno de los pares por orden incremental de asignacion
+
+    int c_min = cost_of_assign(possibles[0]); // minimo costo de usar las soluciones parciales
+    int c_max = cost_of_assign(possibles[possibles.size()-1]); // maximo costo de usar las soluciones parciales
+    pi range = {c_min, c_min + a*(c_max - c_min)};
+
+    vpi res = vpi();
+
     for(auto pair : possibles) {
-        if(pair.first != vertex) {
+        if (res.size() == K) { break; }
+        if((cost_of_assign(pair) - range.first) <= (range.second - range.first)) {
             res.push_back(pair);
         }
     }
@@ -131,39 +130,53 @@ vpi Solution::remove_assigns_of(vpi &possibles, int vertex) {
     return res;
 }
 
-vi Solution::cost_of_possibles(vpi &possibles) {
-    vi res = vi();
-
-    int current_cost = functional();
-
-    for(auto pair : possibles) {
-        int current_assing = assings[pair.first];
-        apply_assign(pair);
-
-        res.push_back(functional() - current_cost);
-
-        apply_assign({pair.first, current_assing});
-    }
-
-    return res;
-}
-
-vpi Solution::get_bests_elements(vpi &possibles, vi &c, pi range) {
-    vpi res = vpi();
-
-    for(int i = 0; i < possibles.size(); i++) {
-        if (res.size() == K) { break; }
-        if((c[i]-range.first) <= (range.second - range.first)) {
-            res.push_back(possibles[i]);
+int Solution::cost_of_current_assign(int &vertex, int &new_assign) {
+    int current_cost = 0;
+    if( assings[vertex] != -1) { // si la anterior asignacion era -1, no generaba ningun costo tal asignacion
+        if(count (assings.begin(), assings.end(), assings[vertex]) == 1) { // si la frecuencia solo estaba usada por este vertice
+            current_cost += cost_of_freqs[assings[vertex]];
+        } else {
+            for(auto u : graph[vertex]) {
+                if(assings[u] == assings[vertex]) {
+                    current_cost += cost_conflict_matrix[u][vertex];
+                }
+            }
         }
     }
+    return current_cost;
+}
 
-    return res;
+int Solution::cost_of_new_assign(int &vertex, int &new_assign) {
+    int current_cost = 0;
+    if (new_assign != -1) {
+        if(count (assings.begin(), assings.end(), new_assign) == 0) { // si la frecuencia no esta usada
+            current_cost += cost_of_freqs[new_assign];
+        } else {
+            for(auto u : graph[vertex]) {
+                if(assings[u] == new_assign) {
+                    current_cost += cost_conflict_matrix[u][vertex];
+                }
+            }
+        }
+    }
+    return current_cost;
+}
+
+int Solution::cost_of_assign(pi i) {
+    // al costo de la nueva asignacion le resto el costo de la vieja asignacion. Por lo tanto, si es negativo, el la solucion es mejor
+    return cost_of_new_assign(i.first, i.second) - cost_of_current_assign(i.first, i.second);
+}
+
+bool Solution::order_assigns(pi &a, pi &b) { return cost_of_assign(a) < cost_of_assign(b); }
+
+void Solution::order_possibles(vpi &possibles) {
+    auto sol = *this;
+    sort(possibles.begin(), possibles.end(), [&sol](pi &a, pi &b) { return sol.order_assigns(a, b); });
 }
 
 void Solution::show_solution() { // por ahora no escribe en files
     for(auto frec_id : assings) { cout << frec_id << endl; }
-    cout << "Cost: " << functional() << endl;
+    cout << "Cost: " << cost << endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -204,19 +217,12 @@ void initialize_all_possible_assignments() { // Inicializa C
 Solution greedy_solution() {
     Solution sol = Solution();
     for (auto vertex : top_sort){
-        Frequency last_freq_used{};
         for(Frequency freq : f) {
             if(sol.assings[vertex] == -1) { // si no tiene ninguna frecuencia asignada.
                 sol.apply_assign({vertex, freq.number_id});
-                last_freq_used = freq;
             } else {
-                int current_cost = sol.functional();
-                sol.apply_assign({vertex, freq.number_id});
-
-                if(current_cost < sol.functional()) { // si no mejoro la anterior
-                    sol.apply_assign({vertex, last_freq_used.number_id});
-                } else {// si si mejoro el costo
-                    last_freq_used = freq;
+                if(sol.cost_of_assign({vertex, freq.number_id}) < 0) {
+                    sol.apply_assign({vertex, freq.number_id});
                 }
             }
         }
@@ -238,19 +244,13 @@ Solution greedy_randomized_construction() {
     Solution sol = Solution();
     vpi possibles = C; // copia de C, todas las posibles asignaciones de la instancia
     while(!sol.is_complete()) {
-        vi c = sol.cost_of_possibles(possibles); // c[i] indica el costo incremental de aplicar la asignacion possibles[i]
-        auto max_min = std::minmax_element(c.begin(), c.end());
-        int c_min = *max_min.first; // minimo costo de usar las soluciones parciales
-        int c_max = *max_min.second; // maximo costo de usar las soluciones parciales
-
-        auto RCL = sol.get_bests_elements(possibles, c, {c_min, c_min + a*(c_max - c_min)}); // Devuelve un vector de pares de asignaciones (vertice, color) con longitud como maximo K
+        auto RCL = sol.get_RCL(possibles); // ordena possibles por costo incremental y devuelve los primeros K pares de asignaciones
         int rand_pos = rand() % RCL.size();
         pi current_assign = RCL[rand_pos]; // Selecciona  un elemento aleatorio de RCL
         sol.apply_assign(current_assign);
 
         possibles = sol.remove_assigns_of(possibles, current_assign.first); // Elimina todas aquellas posibles asignaciones al vertice current_assign.first
     }
-
     return  sol;
 }
 
@@ -258,13 +258,10 @@ Solution local_search(Solution &sol) {
     for(int i = 0; i < N; i ++) {
         if(!graph[i].empty()) { // Si el vertice tiene vecinos, sino no, no tiene sentido cambiarle el color
             for(int f = 0; f < T; f++) {
-                int old_freq = sol.assings[i];
-                if(old_freq != f) {
-                    int old_cost = sol.functional();
-                    sol.apply_assign({i, f});
-
-                    if(old_cost < sol.functional()) {
-                        sol.apply_assign({i, old_freq});
+                if(sol.assings[i] != f) {
+                    // Si es menor a 0 es porque esta asignacion reduce el costo total
+                    if(sol.cost_of_assign({i, f}) < 0) {
+                        sol.apply_assign({i, f});
                     }
                 }
             }
@@ -274,7 +271,7 @@ Solution local_search(Solution &sol) {
     return sol;
 }
 
-bool stop_criteria() { return current_iteration >= maximum_iterations || time(0) >= start_time + maximum_time; }
+bool stop_criteria() { return current_iteration >= maximum_iterations || time(nullptr) >= start_time + maximum_time; }
 
 Solution grasp() {
     initialize_all_possible_assignments();
@@ -282,15 +279,12 @@ Solution grasp() {
     current_iteration = 0;
 
     Solution global_solution = greedy_solution();
-    int global_cost = global_solution.functional();
 
     while(!stop_criteria()) {
         Solution current_solution = greedy_randomized_construction();
         current_solution = local_search(current_solution);
-        int current_cost = current_solution.functional();
-        if(current_cost < global_cost) {
+        if(current_solution.cost < global_solution.cost) {
             global_solution = current_solution;
-            global_cost = current_cost;
         }
         current_iteration++;
     }
@@ -299,7 +293,7 @@ Solution grasp() {
 }
 
 int main() {
-    std::string filename = R"(..\instances\miles250.colcep)";
+    std::string filename = R"(..\instances\input_example.colcep)";
     std::ifstream istrm(filename);
     srand (seed);
 
@@ -309,18 +303,19 @@ int main() {
         istrm >> M;
 
         f = vector<Frequency>();
+        cost_of_freqs = vi();
         cost_conflict_matrix = vector<vi>(N, vector<int>(N, 0));
 
         for (auto i = 0; i < T; i++) {
             istrm >> current;
             f.push_back({current, i}); // {current, i} :: Frequency
+            cost_of_freqs.push_back(current);
         }
 
         // Se ordena f por costo de uso
         sort(f.begin(), f.end(), order_func);
 
         graph = vector<vi>(N, vi());
-        complete_graph = vector<vi>(N, vi(N, 0));
 
         for (auto e = 0; e < M; e++) {
             istrm >> i;
@@ -336,9 +331,6 @@ int main() {
 
             graph[i].push_back(j);
             graph[j].push_back(i);
-
-            complete_graph[i][j] = 1;
-            complete_graph[j][i] = 1;
         }
 
         grasp().show_solution();
