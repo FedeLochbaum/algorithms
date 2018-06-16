@@ -140,9 +140,9 @@ priority_queue<pair<int, pi>, vector<pair<int, pi>>, Greater_compare_assign > So
         }
     }
 
-    pi range = {c_min, c_min + a*(c_max - c_min)};
+    auto upper_bound = static_cast<int>(c_min + a * (c_max - c_min)); // Cota superior variable segun a
 
-    while(p_queue.top().first > range.second) { p_queue.pop(); } // Elimina todas las asignaciones que superan la cota superior
+    while(p_queue.top().first > upper_bound) { p_queue.pop(); } // Elimina todas las asignaciones que superan la cota superior
 
     return p_queue;
 }
