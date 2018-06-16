@@ -35,7 +35,6 @@ mi cost_conflict_matrix; // costo de colisiones de frecuencias para el par de an
 
 ///////////////////////////////////////////// Global variables for greedy randomized construction //////////
 vpi C; // Vector de pares de todas las posibles asignacinoes
-double a = 0.5; // Con a = 0 se vuelve un algoritmo completamente greedy, mientras que con a = 1 se vuelve una estrategia aleatoria
 int K = 4; // Cantidad de elementos maximo de CRL
 unsigned int seed = 23;
 
@@ -51,7 +50,7 @@ bool order_func (Frequency i, Frequency j) { return (i.cost_of_use < j.cost_of_u
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////// Solution /////////////////////////////////////////////////
-struct Greater_compare_assign{ bool operator()(const pair<int, pi> &t1, const pair<int, pi> &t2) const { return t1.first > t2.first; } };
+struct Greater_compare_assign{ bool operator()(const pair<int, pi> &t1, const pair<int, pi> &t2) const { return t1.first < t2.first; } };
 
 struct Solution {
     vi y; // 0 o 1 si la frecuencia con id i esta usada
@@ -60,15 +59,11 @@ struct Solution {
 
     Solution();
     void apply_assign(pi pair);
-
-    // AUX
     void show_solution();
     void update_frequencies(pi &pair);
     bool is_complete();
     vpi remove_assigns_of(vpi &possibles, int vertex);
-    void order_possibles(vpi &possibles);
     int cost_of_assign(pi i);
-    bool order_assigns(pi &a, pi &b);
     priority_queue<pair<int, pi>, vector<pair<int, pi>>, Greater_compare_assign> get_RCL(vpi &possibles);
     int cost_of_current_assign(int &vertex, int &new_assign);
     int cost_of_new_assign(int &vertex, int &new_assign);
@@ -113,7 +108,6 @@ vpi Solution::remove_assigns_of(vpi &possibles, int vertex) {
 }
 
 priority_queue<pair<int, pi>, vector<pair<int, pi>>, Greater_compare_assign > Solution::get_RCL(vpi &possibles) {
-    auto vec = vector<pair<int, pi>>();
     priority_queue<pair<int, pi>, vector<pair<int, pi>>, Greater_compare_assign > p_queue;
 
     if(possibles.size() <= K) {
@@ -121,30 +115,15 @@ priority_queue<pair<int, pi>, vector<pair<int, pi>>, Greater_compare_assign > So
     } else {
         for(int i = 0; i < K; i++) { p_queue.push({cost_of_assign(possibles[i]), possibles[i]}); }
 
-        for(auto k = K; k < possibles.size(); k ++) {
-            int cost = cost_of_assign(possibles[k]);
-            if(cost < p_queue.top().first) {
+        for(auto k = K; k < possibles.size(); k++) {
+            int current_cost = cost_of_assign(possibles[k]);
+            if(current_cost < p_queue.top().first) {
                 p_queue.pop();
-                p_queue.push({cost, possibles[k]});
+                p_queue.push({current_cost, possibles[k]});
             }
         }
     }
 
-//    order_possibles(possibles); // Ordeno de los pares por orden incremental de asignacion
-//
-//    int c_min = cost_of_assign(possibles[0]); // minimo costo de usar las soluciones parciales
-//    int c_max = cost_of_assign(possibles[possibles.size()-1]); // maximo costo de usar las soluciones parciales
-//    pi range = {c_min, c_min + a*(c_max - c_min)};
-//
-//    vpi res = vpi();
-//
-//    for(auto pair : possibles) {
-//        if (res.size() == K) { break; }
-//        if((cost_of_assign(pair) - range.first) <= (range.second - range.first)) {
-//            res.push_back(pair);
-//        }
-//    }
-//    return res;
     return p_queue;
 }
 
@@ -183,13 +162,6 @@ int Solution::cost_of_new_assign(int &vertex, int &new_assign) {
 int Solution::cost_of_assign(pi i) {
     // al costo de la nueva asignacion le resto el costo de la vieja asignacion. Por lo tanto, si es negativo, el la solucion es mejor
     return cost_of_new_assign(i.first, i.second) - cost_of_current_assign(i.first, i.second);
-}
-
-bool Solution::order_assigns(pi &a, pi &b) { return cost_of_assign(a) < cost_of_assign(b); }
-
-void Solution::order_possibles(vpi &possibles) {
-    auto sol = *this;
-    sort(possibles.begin(), possibles.end(), [&sol](pi &a, pi &b) { return sol.order_assigns(a, b); });
 }
 
 void Solution::show_solution() { // por ahora no escribe en files
@@ -309,12 +281,11 @@ Solution grasp() {
         current_iteration++;
     }
 
-    cout << "Cantidad de iteraciones: " << current_iteration << endl;
     return global_solution;
 }
 
 int main() {
-    std::string filename = R"(..\instances\miles500.colcep)";
+    std::string filename = R"(..\instances\miles1500.colcep)";
     std::ifstream istrm(filename);
     srand (seed);
 
