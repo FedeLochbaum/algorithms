@@ -20,7 +20,7 @@ struct Frequency {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////// Global variables ////////////////////////////////////////////
-
+int inf = numeric_limits<int>::max();
 vi top_sort;
 vector<bool> marks;
 int current, i, j, cost;
@@ -35,6 +35,7 @@ mi cost_conflict_matrix; // costo de colisiones de frecuencias para el par de an
 
 ///////////////////////////////////////////// Global variables for greedy randomized construction //////////
 vpi C; // Vector de pares de todas las posibles asignacinoes
+double a = 0.5; // Con a = 0 se vuelve un algoritmo completamente greedy, mientras que con a = 1 se vuelve una estrategia aleatoria
 int K = 4; // Cantidad de elementos maximo de CRL
 unsigned int seed = 23;
 
@@ -110,19 +111,38 @@ vpi Solution::remove_assigns_of(vpi &possibles, int vertex) {
 priority_queue<pair<int, pi>, vector<pair<int, pi>>, Greater_compare_assign > Solution::get_RCL(vpi &possibles) {
     priority_queue<pair<int, pi>, vector<pair<int, pi>>, Greater_compare_assign > p_queue;
 
+    int c_max = 0;
+    int c_min = inf;
+
     if(possibles.size() <= K) {
-        for(auto pair : possibles) { p_queue.push({cost_of_assign(pair), pair}); }
+        for(auto pair : possibles) {
+            int current_cost = cost_of_assign(pair);
+            c_max = max(c_max, current_cost);
+            c_min = min(c_min, current_cost);
+            p_queue.push({current_cost, pair});
+        }
     } else {
-        for(int i = 0; i < K; i++) { p_queue.push({cost_of_assign(possibles[i]), possibles[i]}); }
+        for(int i = 0; i < K; i++) {
+            int current_cost = cost_of_assign(possibles[i]);
+            c_max = max(c_max, current_cost);
+            c_min = min(c_min, current_cost);
+            p_queue.push({current_cost, possibles[i]});
+        }
 
         for(auto k = K; k < possibles.size(); k++) {
             int current_cost = cost_of_assign(possibles[k]);
+            c_max = max(c_max, current_cost);
+            c_min = min(c_min, current_cost);
             if(current_cost < p_queue.top().first) {
                 p_queue.pop();
                 p_queue.push({current_cost, possibles[k]});
             }
         }
     }
+
+    auto upper_bound = static_cast<int>(c_min + a * (c_max - c_min)); // Cota superior variable segun a
+
+    while(p_queue.top().first > upper_bound) { p_queue.pop(); } // Elimina todas las asignaciones que superan la cota superior
 
     return p_queue;
 }
