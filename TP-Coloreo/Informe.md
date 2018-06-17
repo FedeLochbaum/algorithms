@@ -40,8 +40,31 @@ Para la resolución de este trabajo se eligió implementar la metaheurística `G
 # Preliminares
 
 ### GRASP
+`Greedy Randomize Adaptive Search Procedures` o `GRASP` es un método iterativo en donde cada iteración consiste básicamente en dos fases. Una fase constructiva y una busqueda local. La fase constructiva ira construyendo una solución factible `S'` y la busqueda local sera la encargada de investigar la vecindad de `S'` hasta llevarla a un mínimo local.
+
 
 ### Esquema general
+GRASP almacenara una solución global `S` a medida que transcurran las iteraciones del algoritmo. La solución `S` sera la mejor solución encontrada hasta el momento, por lo tanto, cuando se cumpla el criterio de parada de GRASP, el resultado devuelto por dicho algoritmo sera aquel almacenado en `S`. En cada iteración de `GRASP` se construirá una solución greedy `S'` (fase constructiva) la cual sera modificada hasta encontrar un óptimo local (busqueda local). Si el costo del óptimo local de `S'` es menor al costo de `S`, designaremos a `S'` como la nueva solución global.
+
+El criterio de parada puede ser definido en base a una cantidad máxima de iteraciones, una cantidad máxima de tiempo durante el cual el algoritmo estará corriendo, o bien, alguna cota de proximidad a la mejor solución.
+
+Pseudo código de esquema general:
+
+```
+Solución GRASP() {
+  S = ∅;
+  while(! criterio de parada) {
+    S' = Construccion greedy aleatoria();
+    S' = Busqueda local(S');
+    if(Costo(S') < Costo(S)) {
+      S = S';
+    }
+  }
+  return S;
+}
+```
+
+### Greedy Randomized Construction
 
 ### Utilización de cota superior
 
