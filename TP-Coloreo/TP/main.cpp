@@ -305,7 +305,7 @@ Solution grasp() {
 }
 
 int main() {
-    std::string filename = R"(..\instances\miles1500.colcep)";
+    std::string filename = R"(..\instances\dsjr500.1.colcep)";
     std::ifstream istrm(filename);
     srand (seed);
 
