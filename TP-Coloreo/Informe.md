@@ -65,8 +65,39 @@ Solución GRASP() {
 ```
 
 ### Greedy Randomized Construction
+En una heurística constructiva golosa simple se busca construir la solución eligiendo la mejor asignación posible en cada subiteracion. Esto, hace que las soluciones generadas por dicha heurística sean totalmente deterministas, es decir, si llamamos N veces a tal función con la misma instancia obtendremos N veces la misma solución. Por lo tanto, es necesario tener un factor no determinista cuando ha de elegirse cada asignación para una solución.
+
+La heurística Golosa aleatoria propone la creación de una lista de posibles candidatos restringidos (RCL) formada por los mejores elementos, es decir, las mejores posibles asignaciones cuya incorporación a la solución actual resulta en los menores costos incrementales. Esto ultimo hace que el algoritmo sea Greedy.
+
+El elemento (asignación) a ser incorporado en cada subiteracion sera seleccionado al azar dentro de RCL (aquí el aspecto no determinista). Una vez seleccionado el elemento e incorporado a la solución actual, la lista de candidatos (RCL) sera actualizada y los costos incrementales serán re-evaluados.
+
+Las soluciones generadas por una construcción aleatoria golosa no son necesariamente óptimas.
+La fase de búsqueda local generalmente mejora la solución construida. Es decir, recorre iterativamente el vecindario reemplazando sucesivamente la solución actual por una mejor solución en la vecindad de la solución actual.
+
+Pseudo código de esquema general:
+
+```
+Solución Greedy Randomized Construction(Seed) {
+  S = ∅;
+  C = Conjunto de todas las posibles asignaciones;
+  c = Costo incremental de cada asignación dentro de C;
+  while(! Solución esta completa(S)) {
+    c_min = Obtener menor elemento de C usando c;
+    c_max = Obtener mayor elemento de C usando c;
+    RCL = Construir RCL en base a C usando como cota superior {c_min + a(c_max - c_min)};
+    Elem = Obtener elemento aleatorio de RCL;
+    Agregar Elem a S;
+    Actualizar C;
+    Actualizar c;
+  }
+  return S;
+}
+```
+
 
 ### Utilización de cota superior
+
+Como se puede observar, RCL es utilizada para obtener las mejores posibles asignaciones en cada iteración, calculando el costo incremental de cada asignación para la solución actual. Además de obtener las mejores soluciones, se crea una cota superior que filtra posibles soluciones. Para garantizar que esta cota sea manipulable desde afuera, se construye en base a un numero `a` con valor entre `0, 0.1, 0.2, ..., 1`, lo cual hace que, si `a = 0` se vuelve un algoritmo completamente greedy, mientras que con `a = 1` se vuelve una estrategia aleatoria.
 
 ### Reactive GRASP
 
