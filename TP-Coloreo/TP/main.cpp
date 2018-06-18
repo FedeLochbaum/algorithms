@@ -42,7 +42,7 @@ unsigned int seed = 23;
 ////////////////////////////////////////////// Stop Criteria ///////////////////////////////////////////////
 int maximum_iterations = 1000;
 int current_iteration;
-int maximum_time = 300; // 5 minutos
+int maximum_time = 30; // 5 minutos
 time_t start_time;
 
 ///////////////////////////////////////////// Order function //////////////////////////////////////////////
@@ -63,7 +63,6 @@ struct Solution {
     void show_solution();
     void update_frequencies(pi &pair);
     bool is_complete();
-    vpi remove_assigns_of(vpi &possibles, int vertex);
     int cost_of_assign(pi i);
     priority_queue<pair<int, pi>, vector<pair<int, pi>>, Greater_compare_assign> get_RCL(vpi &possibles);
     int cost_of_current_assign(int &vertex, int &new_assign);
@@ -92,20 +91,10 @@ void Solution::update_frequencies(pi &pair) {
 }
 
 bool Solution::is_complete(){
-    for(auto assing : assings) {
+    for(auto &assing : assings) {
         if(assing == -1) { return false; }
     }
     return true;
-}
-
-vpi Solution::remove_assigns_of(vpi &possibles, int vertex) {
-    vpi res = vpi();
-
-    std::copy_if (possibles.begin(), possibles.end(), std::back_inserter(res), [vertex](pi pair){
-        return pair.first != vertex;
-    } );
-
-    return res;
 }
 
 priority_queue<pair<int, pi>, vector<pair<int, pi>>, Greater_compare_assign > Solution::get_RCL(vpi &possibles) {
@@ -115,7 +104,7 @@ priority_queue<pair<int, pi>, vector<pair<int, pi>>, Greater_compare_assign > So
     int c_min = inf;
 
     if(possibles.size() <= K) {
-        for(auto pair : possibles) {
+        for(auto &pair : possibles) {
             int current_cost = cost_of_assign(pair);
             c_max = max(c_max, current_cost);
             c_min = min(c_min, current_cost);
@@ -169,7 +158,7 @@ int Solution::cost_of_new_assign(int &vertex, int &new_assign) {
         if(count (assings.begin(), assings.end(), new_assign) == 0) { // si la frecuencia no esta usada
             current_cost += cost_of_freqs[new_assign];
         } else {
-            for(auto u : graph[vertex]) {
+            for(auto &u : graph[vertex]) {
                 if(assings[u] == new_assign) {
                     current_cost += cost_conflict_matrix[u][vertex];
                 }
@@ -185,7 +174,7 @@ int Solution::cost_of_assign(pi i) {
 }
 
 void Solution::show_solution() { // por ahora no escribe en files
-    for(auto frec_id : assings) { cout << frec_id << endl; }
+    for(auto &frec_id : assings) { cout << frec_id << endl; }
     cout << "Cost: " << cost << endl;
 }
 
@@ -226,7 +215,7 @@ void initialize_all_possible_assignments() { // Inicializa C
 
 Solution greedy_solution() {
     Solution sol = Solution();
-    for (auto vertex : top_sort){
+    for (auto &vertex : top_sort){
         for(Frequency freq : f) {
             if(sol.assings[vertex] == -1) { // si no tiene ninguna frecuencia asignada.
                 sol.apply_assign({vertex, freq.number_id});
@@ -261,8 +250,9 @@ Solution greedy_randomized_construction() {
         pi current_assign = RCL.top().second; // Selecciona  un elemento aleatorio de RCL
         sol.apply_assign(current_assign);
 
-        possibles = sol.remove_assigns_of(possibles, current_assign.first); // Elimina todas aquellas posibles asignaciones al vertice current_assign.first
+        possibles.erase(remove_if(possibles.begin(), possibles.end(),  [&current_assign](pi &pair) { return pair.first == current_assign.first ;}), possibles.end()); // Elimina todas aquellas posibles asignaciones al vertice current_assign.first
     }
+
     return  sol;
 }
 
@@ -300,12 +290,12 @@ Solution grasp() {
         }
         current_iteration++;
     }
-
+    
     return global_solution;
 }
 
 int main() {
-    std::string filename = R"(..\instances\dsjr500.1.colcep)";
+    std::string filename = R"(..\instances\input_example.colcep)";
     std::ifstream istrm(filename);
     srand (seed);
 
