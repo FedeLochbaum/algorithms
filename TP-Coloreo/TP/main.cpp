@@ -42,7 +42,7 @@ unsigned int seed = 23;
 ////////////////////////////////////////////// Stop Criteria ///////////////////////////////////////////////
 int maximum_iterations = 1000;
 int current_iteration;
-int maximum_time = 30; // 5 minutos
+int maximum_time = 300; // 5 minutos
 time_t start_time;
 
 ///////////////////////////////////////////// Order function //////////////////////////////////////////////
@@ -54,40 +54,32 @@ bool order_func (Frequency i, Frequency j) { return (i.cost_of_use < j.cost_of_u
 struct Greater_compare_assign{ bool operator()(const pair<int, pi> &t1, const pair<int, pi> &t2) const { return t1.first < t2.first; } };
 
 struct Solution {
-    vi y; // 0 o 1 si la frecuencia con id i esta usada
+    vi used_frequencies; // used_frequencies[i] indica cuantas antenas usan la frecuencia i
     vi assings; // assings[i] indica la frecuencia asignada al vertice i.
     int cost;
 
     Solution();
     void apply_assign(pi pair);
     void show_solution();
-    void update_frequencies(pi &pair);
     bool is_complete();
     int cost_of_assign(pi i);
     priority_queue<pair<int, pi>, vector<pair<int, pi>>, Greater_compare_assign> get_RCL(vpi &possibles);
-    int cost_of_current_assign(int &vertex, int &new_assign);
-    int cost_of_new_assign(int &vertex, int &new_assign);
+    inline int cost_of_current_assign(int &vertex, int &new_assign);
+    inline int cost_of_new_assign(int &vertex, int &new_assign);
 };
 
 Solution::Solution() {
-    y = vi(T,0);
+    used_frequencies = vi(T,0);
     assings = vi(N, -1);
     cost = 0;
 }
 
 void Solution::apply_assign(pi pair) {
     cost += cost_of_assign(pair);
-    update_frequencies(pair);
+    int old_assign = assings[pair.first];
+    if (old_assign != -1) used_frequencies[ old_assign ] -= 1;
     assings[pair.first] = pair.second;
-}
-
-
-void Solution::update_frequencies(pi &pair) {
-    int old_assing = assings[pair.first];
-    if(old_assing != -1 && count (assings.begin(), assings.end(), old_assing) == 1) { // si solo este vertice lo usaba esta frecuencia
-        y[old_assing] = 0;
-    }
-    y[pair.second] = 1;
+    used_frequencies[pair.second]+=1;
 }
 
 bool Solution::is_complete(){
@@ -136,35 +128,27 @@ priority_queue<pair<int, pi>, vector<pair<int, pi>>, Greater_compare_assign > So
     return p_queue;
 }
 
-int Solution::cost_of_current_assign(int &vertex, int &new_assign) {
+inline int Solution::cost_of_current_assign(int &vertex, int &new_assign) {
     int current_cost = 0;
-    if( assings[vertex] != -1) { // si la anterior asignacion era -1, no generaba ningun costo tal asignacion
-        if(count (assings.begin(), assings.end(), assings[vertex]) == 1) { // si la frecuencia solo estaba usada por este vertice
-            current_cost += cost_of_freqs[assings[vertex]];
-        } else {
-            for(auto u : graph[vertex]) {
-                if(assings[u] == assings[vertex]) {
-                    current_cost += cost_conflict_matrix[u][vertex];
-                }
-            }
-        }
-    }
+    int  current_assign = assings[vertex];
+
+    if (current_assign == -1) { return 0; } // si la anterior asignacion era -1, no generaba ningun costo tal asignacion
+    if (used_frequencies[current_assign] == 1) current_cost += cost_of_freqs[ current_assign ]; // si la frecuencia solo estaba usada por este vertice
+    else
+        for(auto &u : graph[vertex]) { if (assings[u] == current_assign) { current_cost += cost_conflict_matrix[u][vertex]; } }
+
     return current_cost;
 }
 
-int Solution::cost_of_new_assign(int &vertex, int &new_assign) {
+inline int Solution::cost_of_new_assign(int &vertex, int &new_assign) {
     int current_cost = 0;
-    if (new_assign != -1) {
-        if(count (assings.begin(), assings.end(), new_assign) == 0) { // si la frecuencia no esta usada
-            current_cost += cost_of_freqs[new_assign];
-        } else {
-            for(auto &u : graph[vertex]) {
-                if(assings[u] == new_assign) {
-                    current_cost += cost_conflict_matrix[u][vertex];
-                }
-            }
-        }
-    }
+
+    if (new_assign == -1) { return 0; }
+
+    if(used_frequencies[new_assign] == 0) current_cost += cost_of_freqs[new_assign]; // si la frecuencia no esta usada
+    else
+        for(auto &u : graph[vertex]) { if(assings[u] == new_assign) { current_cost += cost_conflict_matrix[u][vertex]; } }
+
     return current_cost;
 }
 
@@ -290,12 +274,13 @@ Solution grasp() {
         }
         current_iteration++;
     }
-    
+
+    cout << "Cantidad de iteraciones: " << current_iteration << endl;
     return global_solution;
 }
 
 int main() {
-    std::string filename = R"(..\instances\input_example.colcep)";
+    std::string filename = R"(..\instances\r1000.1.colcep)";
     std::ifstream istrm(filename);
     srand (seed);
 
