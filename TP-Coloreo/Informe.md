@@ -71,9 +71,6 @@ La heurística Golosa aleatoria propone la creación de una lista de posibles ca
 
 El elemento (asignación) a ser incorporado en cada subiteracion sera seleccionado al azar dentro de RCL (aquí el aspecto no determinista). Una vez seleccionado el elemento e incorporado a la solución actual, la lista de candidatos (RCL) sera actualizada y los costos incrementales serán re-evaluados.
 
-Las soluciones generadas por una construcción aleatoria golosa no son necesariamente óptimas.
-La fase de búsqueda local generalmente mejora la solución construida. Es decir, recorre iterativamente el vecindario reemplazando sucesivamente la solución actual por una mejor solución en la vecindad de la solución actual.
-
 Pseudo código de esquema general:
 
 ```
@@ -99,11 +96,35 @@ Solución Greedy Randomized Construction(Seed) {
 
 Como se puede observar, RCL es utilizada para obtener las mejores posibles asignaciones en cada iteración, calculando el costo incremental de cada asignación para la solución actual. Además de obtener las mejores soluciones, se crea una cota superior que filtra posibles soluciones. Para garantizar que esta cota sea manipulable desde afuera, se construye en base a un numero `a` con valor entre `0, 0.1, 0.2, ..., 1`, lo cual hace que, si `a = 0` se vuelve un algoritmo completamente greedy, mientras que con `a = 1` se vuelve una estrategia aleatoria.
 
-
 ### Local Search
 
+Las soluciones generadas por una construcción aleatoria golosa no son necesariamente óptimas.
+La fase de búsqueda local generalmente mejora la solución construida. Es decir, recorre iterativamente el vecindario reemplazando sucesivamente la solución actual por una mejor solución en la vecindad de la solución actual.
+
+Pseudo código de esquema general:
+
+```
+
+Solución Local Search(Solution) {
+  while(Solution no optima del vecindario) {
+    Encontrar s0 vecino de Solution;
+    if(Costo(s0) < Costo(Solución)) {
+      Solution = s0;
+    }
+  }
+  return Solution;
+}
+
+```
+
+La efectividad de un algoritmo de Local search depende de como este definida la estructura de vecindario y como se implemente la busqueda dentro de este. Usualmente cuando se utiliza una metaheurística GRASP donde las soluciones constructivas poseen buenos resultados, suelen definirse vecindarios simplificados.
 
 ### Reactive GRASP
+
+`Reactive GRASP ` es una variante de GRASP que intenta mejorar las soluciones no fijando el valor de `a` en cambio, propone auto-ajustarlo periódicamente a medida que se generen nuevas soluciones.
+
+Se define un conjunto ` A = {0.0, 0.1, ... , 0.9, 1.0}` de posibles valores para `a`, los cuales tendrán una probabilidad de selección ajustada dinámicamente. En la primer iteración, cada elemento de `A` tendrá probabilidad = 1. Para Cada elemento `a_i` de `A` se guardaran todos los valor de las soluciones generadas utilizando `a = a_i`, luego de cada iteración se computa `q_1 = Costo(s*) / a_i ` donde s* es la mejor solución encontrada hasta ese punto. Finalmente, se define la nueva probabilidad `p_i` para `a_i` como `p_i = q_i / ∑ con j=1 hasta n  de q_j`.
+
 
 # Algoritmo
 
