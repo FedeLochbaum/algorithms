@@ -35,7 +35,6 @@ mi cost_conflict_matrix; // costo de colisiones de frecuencias para el par de an
 
 ///////////////////////////////////////////// Global variables for greedy randomized construction //////////
 vpi C; // Vector de pares de todas las posibles asignacinoes
-double a = 0.5; // Con a = 0 se vuelve un algoritmo completamente greedy, mientras que con a = 1 se vuelve una estrategia aleatoria
 int K = 4; // Cantidad de elementos maximo de CRL
 unsigned int seed = 23;
 
@@ -63,7 +62,7 @@ struct Solution {
     void show_solution();
     bool is_complete();
     int cost_of_assign(pi i);
-    priority_queue<pair<int, pi>, vector<pair<int, pi>>, Greater_compare_assign> get_RCL(vpi &possibles);
+    priority_queue<pair<int, pi>, vector<pair<int, pi>>, Greater_compare_assign> get_RCL(vpi &possibles, double &a);
     inline int cost_of_current_assign(int &vertex, int &new_assign);
     inline int cost_of_new_assign(int &vertex, int &new_assign);
 };
@@ -89,7 +88,7 @@ bool Solution::is_complete(){
     return true;
 }
 
-priority_queue<pair<int, pi>, vector<pair<int, pi>>, Greater_compare_assign > Solution::get_RCL(vpi &possibles) {
+priority_queue<pair<int, pi>, vector<pair<int, pi>>, Greater_compare_assign > Solution::get_RCL(vpi &possibles, double &a) {
     priority_queue<pair<int, pi>, vector<pair<int, pi>>, Greater_compare_assign > p_queue;
 
     int c_max = 0;
@@ -214,7 +213,7 @@ Solution greedy_solution() {
     return sol;
 }
 
-Solution greedy_randomized_construction() {
+Solution greedy_randomized_construction(double &a) {
     //TODO: Esquema de greedy_randomized_construction
     // Definir C conjunto total de posibles asignaciones  N * T
     // Definir RCL conjunto de mejores K posibles asignaciones, restringida por K y ordenada por calidad
@@ -227,7 +226,7 @@ Solution greedy_randomized_construction() {
     Solution sol = Solution();
     vpi possibles = C; // copia de C, todas las posibles asignaciones de la instancia
     while(!sol.is_complete()) {
-        auto RCL = sol.get_RCL(possibles); // ordena possibles por costo incremental y devuelve los primeros K pares de asignaciones
+        auto RCL = sol.get_RCL(possibles, a); // ordena possibles por costo incremental y devuelve los primeros K pares de asignaciones
         int rand_pos = rand() % RCL.size();
         int count = 0;
         while(count != rand_pos) { RCL.pop(); count++; }
@@ -260,6 +259,7 @@ Solution local_search(Solution &sol) {
 bool stop_criteria() { return current_iteration >= maximum_iterations || time(nullptr) >= start_time + maximum_time; }
 
 Solution grasp() {
+    vector<double > possibles_a = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
     initialize_all_possible_assignments();
     start_time = time(0);
     current_iteration = 0;
@@ -267,7 +267,9 @@ Solution grasp() {
     Solution global_solution = greedy_solution();
 
     while(!stop_criteria()) {
-        Solution current_solution = greedy_randomized_construction();
+        int rand_pos = rand() % possibles_a.size();
+        double a = possibles_a[rand_pos]; // Con a = 0 se vuelve un algoritmo completamente greedy, mientras que con a = 1 se vuelve una estrategia aleatoria
+        Solution current_solution = greedy_randomized_construction(a);
         current_solution = local_search(current_solution);
         if(current_solution.cost < global_solution.cost) {
             global_solution = current_solution;
