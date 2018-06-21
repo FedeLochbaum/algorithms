@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <fstream>
 #include <queue>
+#include <random>
 
 using namespace std;
 
@@ -37,9 +38,9 @@ mi cost_conflict_matrix; // costo de colisiones de frecuencias para el par de an
 vpi C; // Vector de pares de todas las posibles asignacinoes
 int K = 4; // Cantidad de elementos maximo de CRL
 unsigned int seed = 23;
-
+mt19937 mt(seed);
 ////////////////////////////////////////////// Stop Criteria ///////////////////////////////////////////////
-int maximum_iterations = 1000;
+int maximum_iterations = 10000;
 int current_iteration;
 int maximum_time = 300; // 5 minutos
 time_t start_time;
@@ -227,7 +228,8 @@ Solution greedy_randomized_construction(double &a) {
     vpi possibles = C; // copia de C, todas las posibles asignaciones de la instancia
     while(!sol.is_complete()) {
         auto RCL = sol.get_RCL(possibles, a); // ordena possibles por costo incremental y devuelve los primeros K pares de asignaciones
-        int rand_pos = rand() % RCL.size();
+        uniform_int_distribution<int> dist(0, RCL.size());
+        int rand_pos = dist(mt);
         int count = 0;
         while(count != rand_pos) { RCL.pop(); count++; }
         pi current_assign = RCL.top().second; // Selecciona  un elemento aleatorio de RCL
@@ -259,16 +261,16 @@ Solution local_search(Solution &sol) {
 bool stop_criteria() { return current_iteration >= maximum_iterations || time(nullptr) >= start_time + maximum_time; }
 
 Solution grasp() {
-    vector<double > possibles_a = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
     initialize_all_possible_assignments();
+
+    uniform_real_distribution<double> dist(0.0, 1.0);
     start_time = time(0);
     current_iteration = 0;
 
     Solution global_solution = greedy_solution();
 
     while(!stop_criteria()) {
-        int rand_pos = rand() % possibles_a.size();
-        double a = possibles_a[rand_pos]; // Con a = 0 se vuelve un algoritmo completamente greedy, mientras que con a = 1 se vuelve una estrategia aleatoria
+        double a = dist(mt); // Con a = 0 se vuelve un algoritmo completamente greedy, mientras que con a = 1 se vuelve una estrategia aleatoria
         Solution current_solution = greedy_randomized_construction(a);
         current_solution = local_search(current_solution);
         if(current_solution.cost < global_solution.cost) {
@@ -282,9 +284,8 @@ Solution grasp() {
 }
 
 int main() {
-    std::string filename = R"(..\instances\r1000.1.colcep)";
+    std::string filename = R"(..\instances\miles500.colcep)";
     std::ifstream istrm(filename);
-    srand (seed);
 
     if(istrm.is_open()) {
         istrm >> N;
