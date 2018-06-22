@@ -288,7 +288,7 @@ priority_queue<pair<int, pi>, vector<pair<int, pi>>, Less_compare_assign > best_
 }
 
 void add_or_replace_elites(Solution &sol) {
-    if(elite_vector.size() > max_elites) {
+    if(elite_vector.size() == max_elites) {
         int pos = get_position_of_worst_elite();
         if(sol.cost < elite_vector[pos].cost) { elite_vector[pos] = sol; }
     } else { elite_vector.push_back(sol); }
@@ -304,12 +304,9 @@ Solution path_relinking(Solution &current_sol, Solution &elite_sol) {
         queue.pop();
 
         new_current_solution.apply_assign(assign);
-        if(new_current_solution.cost < best_solution.cost) {
-            best_solution = new_current_solution;
-            add_or_replace_elites(best_solution);
-        }
+        if(new_current_solution.cost < best_solution.cost) { best_solution = new_current_solution; }
     }
-    best_solution;
+    return best_solution;
 }
 
 bool stop_criteria() { return current_iteration >= maximum_iterations || time(nullptr) >= start_time + maximum_time; }
@@ -330,11 +327,9 @@ Solution grasp() {
 
         uniform_int_distribution<int> dist_elites(0, elite_vector.size()-1);
         int rand_pos_elite = dist_elites(mt);
-
         current_solution = path_relinking(current_solution, elite_vector[rand_pos_elite]);
+        add_or_replace_elites(current_solution);
         if(current_solution.cost < global_solution.cost) {
-            cout << "Mejoro a: " << global_solution.cost << " por: " << current_solution.cost << endl;
-            add_or_replace_elites(current_solution);
             global_solution = current_solution;
         }
         current_iteration++;
