@@ -125,6 +125,17 @@ La efectividad de un algoritmo de Local search depende de como este definida la 
 
 Se define un conjunto ` A = {0.0, 0.1, ... , 0.9, 1.0}` de posibles valores para `a`, los cuales tendrán una probabilidad de selección ajustada dinámicamente. En la primer iteración, cada elemento de `A` tendrá probabilidad = 1. Para Cada elemento `a_i` de `A` se guardaran todos los valor de las soluciones generadas utilizando `a = a_i`, luego de cada iteración se computa `q_1 = Costo(s*) / a_i ` donde s* es la mejor solución encontrada hasta ese punto. Finalmente, se define la nueva probabilidad `p_i` para `a_i` como `p_i = q_i / ∑ con j=1 hasta n  de q_j`.
 
+### Path Relinking
+
+La idea de path relinking es buscar soluciones que compartan atributos con antiguas soluciones con la esperanza de obtener mejores soluciones.
+
+Path relinking construye nuevas soluciones explotando las trayectorias que conectan a las soluciones buenas, empezando con alguna de las soluciones, llamada la solución de iniciación y generando un camino en la vecindad del espacio que lleva a otras soluciones, llamadas las soluciones guías.
+
+Se han propuesto dos posibles aplicaciones de path relinking en combinación con GRASP:
+
+- Utilizar path relinking como un proceso de optimización posterior a todos los pares de soluciones "elite" encontradas con GRASP.  
+
+- Utilizar path relinking como una estrategia de intensificación aplicada a cada solución obtenida después de la fase de búsqueda local.
 
 # Algoritmo
 
