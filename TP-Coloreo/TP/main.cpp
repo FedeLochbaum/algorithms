@@ -258,6 +258,25 @@ Solution local_search(Solution &sol) {
     return sol;
 }
 
+vector<Solution> elite_vector;
+
+Solution path_relinking(Solution &current_sol, Solution &elite_sol) {
+    auto queue = best_differences_assign(current_sol, elite_sol);
+
+    int iterations = 0;
+    while(iterations != N && queue.size() > 0) {
+        Solution new_sol = current_sol;
+        pi assign = queue.top();
+        queue.pop();
+        new_sol.apply_assign(assign);
+        if(new_sol.cost < current_sol.cost) {
+            current_sol = new_sol;
+        }
+        add_or_replace_elites(elite_vector, new_sol);
+    }
+    current_sol;
+}
+
 bool stop_criteria() { return current_iteration >= maximum_iterations || time(nullptr) >= start_time + maximum_time; }
 
 Solution grasp() {
@@ -268,12 +287,15 @@ Solution grasp() {
     current_iteration = 0;
 
     Solution global_solution = greedy_solution();
+    elite_vector.push_back(global_solution);
 
     while(!stop_criteria()) {
         double a = dist(mt); // Con a = 0 se vuelve un algoritmo completamente greedy, mientras que con a = 1 se vuelve una estrategia aleatoria
         Solution current_solution = greedy_randomized_construction(a);
         current_solution = local_search(current_solution);
+        current_solution = path_relinking(current_solution, elite_vector[rand_pos]);
         if(current_solution.cost < global_solution.cost) {
+            add_or_replace_elites(, current_solution);
             global_solution = current_solution;
         }
         current_iteration++;
