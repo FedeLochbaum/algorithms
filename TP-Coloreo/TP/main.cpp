@@ -40,8 +40,8 @@ int K = 4; // Cantidad de elementos maximo de CRL
 unsigned int seed = 23;
 mt19937 mt(seed);
 ////////////////////////////////////////////// Reactive GRASP //////////////////////////////////////////////
-int count_of_iteration_for_recalculate = 20;
-vector<double> possibles_a = {0.0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0};
+int count_of_iteration_for_recalculate = 100;
+vector<double> possibles_a = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
 vector<double> quality_of_average_costs = vector<double>(possibles_a.size());
 vector<double> probabilities = vector<double>(possibles_a.size(), 1.0/ possibles_a.size()); // Todos arrancan con probabilidad 1 / m donde m es la cantidad de elementos (arranca equiprobable)
 vector<int> cost_averages = vi(possibles_a.size()); // el costo promedio de soluciones encontradas para cada a_i
@@ -267,8 +267,7 @@ Solution local_search(Solution &sol) {
 
 bool stop_criteria() { return current_iteration >= maximum_iterations || time(nullptr) >= start_time + maximum_time; }
 
-void re_calculate_probabilities(int best_current_cost) {
-
+void re_calculate_probabilities(int &best_current_cost) {
     for (int i = 0; i < cost_averages.size(); i++) {
         if(!all_cost_for_each_a[i].empty()) {
             cost_averages[i] = accumulate(all_cost_for_each_a[i].begin(),all_cost_for_each_a[i].end(), 0) / all_cost_for_each_a[i].size(); // calcula el promedio de los costos con ese valor de a
@@ -281,11 +280,14 @@ void re_calculate_probabilities(int best_current_cost) {
         }
     }
 
+    //TODO: Revisar que probabilidad asignarle a los valores que aun no tienen soluciones
     for(int p = 0; p < probabilities.size(); p++) {
         auto summ_of_averages = accumulate(quality_of_average_costs.begin(), quality_of_average_costs.end(), 0.0);
         if(summ_of_averages != 0) {
             probabilities[p] = quality_of_average_costs[p] / summ_of_averages;
         }
+
+        cout << "probabilidad para a = " << possibles_a[p] << " = " << probabilities[p] << endl;
     }
 }
 
