@@ -63,7 +63,6 @@ struct Solution {
     Solution();
     void apply_assign(pi pair);
     void show_solution();
-    bool is_complete();
     int cost_of_assign(pi i);
     priority_queue<pair<int, pi>, vector<pair<int, pi>>, Greater_compare_assign> get_RCL(vpi &possibles, double &a);
     inline int cost_of_current_assign(int &vertex, int &new_assign);
@@ -82,13 +81,6 @@ void Solution::apply_assign(pi pair) {
     if (old_assign != -1) used_frequencies[ old_assign ] -= 1;
     assings[pair.first] = pair.second;
     used_frequencies[pair.second]+=1;
-}
-
-bool Solution::is_complete(){
-    for(auto &assing : assings) {
-        if(assing == -1) { return false; }
-    }
-    return true;
 }
 
 priority_queue<pair<int, pi>, vector<pair<int, pi>>, Greater_compare_assign > Solution::get_RCL(vpi &possibles, double &a) {
