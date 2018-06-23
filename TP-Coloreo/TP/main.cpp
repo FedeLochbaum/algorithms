@@ -228,7 +228,7 @@ Solution greedy_randomized_construction(double &a) {
     //TODO: Solucion
     Solution sol = Solution();
     vpi possibles = C; // copia de C, todas las posibles asignaciones de la instancia
-    while(!sol.is_complete()) {
+    while(!possibles.empty()) {
         auto RCL = sol.get_RCL(possibles, a); // ordena possibles por costo incremental y devuelve los primeros K pares de asignaciones
         uniform_int_distribution<int> dist(0, RCL.size());
         int rand_pos = dist(mt);
@@ -260,7 +260,7 @@ Solution local_search(Solution &sol) {
     return sol;
 }
 //
-int max_elites = 5; // Numero de maxima cantidad de elites
+int max_elites = 4; // Numero de maxima cantidad de elites
 vector<Solution> elite_vector;
 
 int get_position_of_worst_elite() {
@@ -328,8 +328,9 @@ Solution grasp() {
         uniform_int_distribution<int> dist_elites(0, elite_vector.size()-1);
         int rand_pos_elite = dist_elites(mt);
         current_solution = path_relinking(current_solution, elite_vector[rand_pos_elite]);
-        add_or_replace_elites(current_solution);
         if(current_solution.cost < global_solution.cost) {
+            add_or_replace_elites(current_solution);
+            cout << "Mejore " << global_solution.cost << " por " << current_solution.cost << endl;
             global_solution = current_solution;
         }
         current_iteration++;
@@ -340,7 +341,7 @@ Solution grasp() {
 }
 
 int main() {
-    std::string filename = R"(..\instances\miles500.colcep)";
+    std::string filename = R"(..\instances\r250.1.colcep)";
     std::ifstream istrm(filename);
 
     if(istrm.is_open()) {
