@@ -140,7 +140,7 @@ Se han propuesto dos posibles aplicaciones de path relinking en combinación con
 # Algoritmo
 Como solución para el presente problema, se desarrollo una versión general de `GRASP` que designa valores aleatorios equiprobables para `a`, determinando la cota superior para cada iteración del algoritmo. Además, se implementaron dos variantes para dicha metaheurística, `Path relinking`, `Reactive GRASP` y una versión donde se utilizan ambas.
 
-### Estructuras euxiliares
+### Estructuras Auxiliares
 Para simplificar la legibilidad del código, se  definieron dos estructuras. Por un lado `Frequency` la representación de una frecuencia, la cual contiene su identificador como la iesima frecuencia y su costo en caso de ser usada. Por otro lado, se definió `Solution` estructura que contiene `assigns` un vector de las asignaciones antena -> frecuencia, `used_frequencies` un vector de las frecuencias utilizadas, indicando cuantas antenas usa la iesima frecuencia y finalmente, `cost` el costo actual de la solución.
 
 ### Heurística Greedy
@@ -168,7 +168,35 @@ Solution greedy_solution() {
 Como dicho algoritmo da resultados aceptables dentro de los parametros, se lo utiliza como solución inicial en la implementación de `GRASP`.
 
 ### Heurística Greedy Randomized Construction
+El algoritmo mas importante de la metaheurística `GRASP`, comienza creando una nueva solución `S` vacia. Define un conjunto `possibles ` de todos los pares de asignaciones `(Antena, Frecuencia)` de longitud `N * F` donde `N` es la cantidad de antenas y `F` la cantidad de frecuencias de la instancia.
 
+Luego, por cada iteración del algoritmo y utilizando el conjunto `possibles` define un nuevo conjunto `RCL` de mejores `K` posibles asignaciones, restringida por `K ` un valor parametrizable que permite obtener mas o menos soluciones y `a` un valor entre `[0..1]` utilizado para definir una cota superior.
+
+Cuando `RCL` es calculado en cada subiteracion, se ordena de menor a mayor todas las asignaciones que posee en ese momento el conjunto `possibles`. Para lograr esto se utiliza una `Priority Queue` que mantiene como invariante que, el par de mayor costo se encuentra en el top de la queue. Este invariante es utilizado para reducir el orden computacional en cada subiteracion. Así, una vez se hayan agregado los primeros `K` pares de asignaciones, solo basta recorrer el resto de `possibles` verificando si el costo incremental del actual par es menor al top de la `Priority Queue`, si es así solo basta quitarlo de la queue y agregar el nuevo par.
+
+Posteriormente, se define la cota superior como `c_min + a * (c_max - c_min)` donde `c_min` es el menor costo incremental observado hasta el momento y `c_max` su opuesto. Entonces, antes de finalizar la construcción de `RCL` se eliminan de la `Priority Queue` todos los pares de asignaciones tal que su costo incremental para el estado actual de la solución `S` es mayor al de la cota superior. Esto es de gran importancia ya que diferentes valores de `a` pueden determinar si la construcción de una solución actual es totalmente `Greedy` o totalmente aleatoria.
+
+Una vez calculado `RCL` se obtiene aleatoriamente un elemento `(I, F)` de dicho conjunto tal que dicha asignación se aplicara a la solución actual. Luego de haber realizado esta asignación deberá actualizarse `possibles` eliminando todos los elementos que representen una posible asignación `F'` para la antena `I`. Por lo tanto dicho algoritmo solo hará una iteración por cada una de las antenas reduciendo constantemente la cantidad de elementos del conjunto de posibles asignaciones.
+
+Pseudo código de construcción aleatoria greedy:
+
+```
+Solution greedy_randomized_construction(double a) {
+   S = Nueva solución;
+   possibles = Todos los posbiles par (i, f) tal que i es una antena y f una frecuencia
+   while(S no este completa) {
+       RCL = Obtener RCL a partir de possbiles tq |RCL| <= K
+       Upper bound = c_min + a * (c_max - c_min)
+       Eliminar todos los pares que superen Upper bound
+       Assign = Obtener algun elemento aleatorio de RCL
+       Aplicar Assign a S
+
+       Actualizar possibles
+   }
+
+   return  sol;
+}
+```
 
 ### Heurística Local Search
 
