@@ -203,6 +203,7 @@ Usualmente cuando se implementa `GRASP` la busqueda local es definida en base a 
 
 Entonces, dada la solución `S` creada en la fase constructiva, por cada antena `i` de la instancia y por cada frecuencia `f` se calcula si, reemplazando la actual asignación `S(i)` por `f` el costo total de `S` disminuye. Si el costo total de la solución `S` mejora, entonces se reemplaza `S(i)` por `f`.
 
+Pseudo código de busqueda local:
 ```
 Solution local_search(Solution S) {
     for(cada antena i) {
@@ -217,14 +218,37 @@ Solution local_search(Solution S) {
 ```
 
 ### GRASP
+Similar al esquema general, en cada iteración el algoritmo posee tres fases, una fase constructiva, una fase de busqueda local y una fase de actualización de óptimo global.
+
+En cada iteración se elije aleatoriamente un nuevo valor para `a` entre `[0..1]`, el cual es pasado como argumento a la fase constructiva, esta fase constructiva generara una nueva solución `S` totalmente diferente a las soluciones generadas en iteraciones anteriores a la cual se le aplica una busqueda local. Entonces, la busqueda local generara una nueva solución `S'` que sera la mejor solución encontrada dentro del vecindario de `S`. Luego, en fase de actualización se chequea si la solución `S'` es una mejor solución al óptimo global, si es así, el nuevo óptimo global sera  `S'`.
+
+Pseudo código de GRASP:
+
+```
+Solution grasp() {
+    Sg = greedy_solution();
+    while(No se cumpla criterio de parada) {
+        a = Generar un numero entre [0..1];
+
+        S = greedy_randomized_construction(a);
+        S = local_search(S);
+        if(Costo(S) < Costo(Sg)) {
+            Sg = S;
+        }
+    }
+    return Sg;
+}
+```
 
 ### Criterio de parada
+El criterio de parada utilizado para esta implementación esta basado en un `OR` condicional de dos cosas. Por un lado, una cantidad de tiempo limite de ejecución `T` y por otro, una cantidad máxima de iteraciones de `GRASP`, ambos valores parametrizables para futuras pruebas.
 
-### Ordenes de complejidad
 
-### GRASP + Path relinking
+### GRASP + Path Relinking
 
 ### Reactive GRASP
+
+### Ordenes de complejidad
 
 # Experimentación
 
