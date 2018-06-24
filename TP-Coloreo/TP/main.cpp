@@ -270,7 +270,9 @@ Solution local_search(Solution &sol) {
 
 bool stop_criteria() { return current_iteration >= maximum_iterations || time(nullptr) >= start_time + maximum_time; }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int max_elites = 5; // Numero de maxima cantidad de elites
+
+///////////////////////////////////////////////////////// AUX PATH RELINKING /////////////////////////////////////////
+int max_elites = 4; // Numero de maxima cantidad de elites
 vector<Solution> elite_vector;
 
 int get_position_of_worst_elite() {
@@ -298,7 +300,7 @@ priority_queue<pair<int, pi>, vector<pair<int, pi>>, Less_compare_assign > best_
 }
 
 void add_or_replace_elites(Solution &sol) {
-    if(elite_vector.size() > max_elites) {
+    if(elite_vector.size() == max_elites) {
         int pos = get_position_of_worst_elite();
         if(sol.cost < elite_vector[pos].cost) { elite_vector[pos] = sol; }
     } else { elite_vector.push_back(sol); }
@@ -314,14 +316,13 @@ Solution path_relinking(Solution &current_sol, Solution &elite_sol) {
         queue.pop();
 
         new_current_solution.apply_assign(assign);
-        if(new_current_solution.cost < best_solution.cost) {
-            best_solution = new_current_solution;
-            add_or_replace_elites(best_solution);
-        }
+        if(new_current_solution.cost < best_solution.cost) { best_solution = new_current_solution; }
     }
-    best_solution;
+    return best_solution;
 }
+///////////////////////////////////////// FIN AUX PATH RELINKING /////////////////////////////
 
+///////////////////////////////////////// AUX REACTIVE GRASP /////////////////////////////////
 void re_calculate_probabilities(int &best_current_cost) {
     for (int i = 0; i < cost_averages.size(); i++) {
         if(!all_cost_for_each_a[i].empty()) {
@@ -347,6 +348,8 @@ int get_random_pos_of_a() {
     std::discrete_distribution<int> distribution (probabilities.begin(), probabilities.end());
     return distribution(mt);
 }
+///////////////////////////////////////////////// FIN AUX REACTIVE GRASP ////////////////////////////
+
 ///////////////////////////////////////////////// GRASP /////////////////////////////////////////////
 Solution grasp() {
     initialize_all_possible_assignments();
@@ -362,7 +365,7 @@ Solution grasp() {
         Solution current_solution = greedy_randomized_construction(a);
         current_solution = local_search(current_solution);
         if(current_solution.cost < global_solution.cost) {
-            cout << "Mejoro: " << global_solution.cost << " por: " << current_solution.cost << endl;
+            cout << "Mejore " << global_solution.cost << " por " << current_solution.cost << endl;
             global_solution = current_solution;
         }
         current_iteration++;
@@ -391,7 +394,7 @@ Solution reactive_grasp() {
         all_cost_for_each_a[pos_a].push_back(current_solution.cost); // Agrega el costo de la solucion actual al vector de costos para esa posicion de a
 
         if(current_solution.cost < global_solution.cost) {
-            cout << "Mejoro: " << global_solution.cost << " por: " << current_solution.cost << endl;
+            cout << "Mejore " << global_solution.cost << " por " << current_solution.cost << endl;
             global_solution = current_solution;
         }
         current_iteration++;
@@ -419,11 +422,10 @@ Solution grasp_with_path_relinking() {
 
         uniform_int_distribution<int> dist_elites(0, elite_vector.size()-1);
         int rand_pos_elite = dist_elites(mt);
-
         current_solution = path_relinking(current_solution, elite_vector[rand_pos_elite]);
         if(current_solution.cost < global_solution.cost) {
-            cout << "Mejoro: " << global_solution.cost << " por: " << current_solution.cost << endl;
             add_or_replace_elites(current_solution);
+            cout << "Mejore " << global_solution.cost << " por " << current_solution.cost << endl;
             global_solution = current_solution;
         }
         current_iteration++;
@@ -432,7 +434,6 @@ Solution grasp_with_path_relinking() {
     cout << "Cantidad de iteraciones: " << current_iteration << endl;
     return global_solution;
 }
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////// REACTIVE GRASP + PATH RELINKING /////////////////////////////////
@@ -448,20 +449,18 @@ Solution reactive_grasp_with_path_relinking() {
         if(current_iteration % count_of_iteration_for_recalculate == 0) { re_calculate_probabilities(global_solution.cost); }
         int pos_a = get_random_pos_of_a();
         double a = possibles_a[pos_a]; // Con a = 0 se vuelve un algoritmo completamente greedy, mientras que con a = 1 se vuelve una estrategia aleatoria
-
         Solution current_solution = greedy_randomized_construction(a);
         current_solution = local_search(current_solution);
 
-        uniform_int_distribution<int> dist_elites(0, elite_vector.size()-1);
-        int rand_pos_elite = dist_elites(mt);
-
-        current_solution = path_relinking(current_solution, elite_vector[rand_pos_elite]);
-
         all_cost_for_each_a[pos_a].push_back(current_solution.cost); // Agrega el costo de la solucion actual al vector de costos para esa posicion de a
 
+        uniform_int_distribution<int> dist_elites(0, elite_vector.size()-1);
+        int rand_pos_elite = dist_elites(mt);
+        current_solution = path_relinking(current_solution, elite_vector[rand_pos_elite]);
+
         if(current_solution.cost < global_solution.cost) {
-            cout << "Mejoro: " << global_solution.cost << " por: " << current_solution.cost << endl;
             add_or_replace_elites(current_solution);
+            cout << "Mejore " << global_solution.cost << " por " << current_solution.cost << endl;
             global_solution = current_solution;
         }
         current_iteration++;
@@ -512,7 +511,7 @@ int main() {
             graph[j].push_back(i);
         }
 
-        grasp_with_path_relinking().show_solution();
+        reactive_grasp_with_path_relinking().show_solution();
     }
 
     return 0;
