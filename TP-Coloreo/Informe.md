@@ -194,11 +194,27 @@ Solution greedy_randomized_construction(double a) {
        Actualizar possibles
    }
 
-   return  sol;
+   return  S;
 }
 ```
 
 ### Heurística Local Search
+Usualmente cuando se implementa `GRASP` la busqueda local es definida en base a un vecindario simplificado, esto es así ya que, como la heurística de construcción aleatoria logra buenas soluciones, definir un vecindario muy complejo haría que el costo computacional crezca, lo que evitaría la realización de mas iteraciones de fases constructivas. En esta implementación, el vecindario va a estar definido por todas las soluciones que difieran de una sola asignación, esto es, dado dos soluciones `s1` y `s2` existe una única antena `i` tal que la `s1(i) != s2(i)`.
+
+Entonces, dada la solución `S` creada en la fase constructiva, por cada antena `i` de la instancia y por cada frecuencia `f` se calcula si, reemplazando la actual asignación `S(i)` por `f` el costo total de `S` disminuye. Si el costo total de la solución `S` mejora, entonces se reemplaza `S(i)` por `f`.
+
+```
+Solution local_search(Solution S) {
+    for(cada antena i) {
+      for(cada frecuencia f) {
+        if(el costo de {i, f} < 0) {
+          Asignarle a i la frecuencia f
+        }
+      }
+    }
+    return S;
+}
+```
 
 ### GRASP
 
@@ -219,8 +235,6 @@ Solution greedy_randomized_construction(double a) {
 ### Tipos de pruebas
 
 ### Pruebas
-
-
 
 # Conclusiones
 
