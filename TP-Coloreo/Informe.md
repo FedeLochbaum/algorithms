@@ -243,8 +243,54 @@ Solution grasp() {
 ### Criterio de parada
 El criterio de parada utilizado para esta implementación esta basado en un `OR` condicional de dos cosas. Por un lado, una cantidad de tiempo limite de ejecución `T` y por otro, una cantidad máxima de iteraciones de `GRASP`, ambos valores parametrizables para futuras pruebas.
 
-
 ### GRASP + Path Relinking
+Una de las variantes implementadas para mejorar las soluciones de GRASP es `Path Relinking`. Este algoritmo es incluido dentro de `GRASP` como una segunda mejora a la solución actual. Es decir, cuando la busqueda local es aplicada a la solución creada por la fase constructiva generando una solución `S'` se aplicara path relinking sobre `S'` generando así una tercera solución local `S''` la cual posteriormente se usara como comparación para la fase de actualización. Ahora, cuando la solución `S''` mejore el óptimo global, no solo sera el nuevo óptimo global sino que también se agregara a `elites`.
+
+Definiremos `Z` un nuevo valor parametrizable el cual representa la cantidad máxima de `elites` a mantener.
+
+En cada iteración de `GRASP`, se elegirá aleatoriamente una solución `Se` dentro de las soluciones `elites` la cual se pasara como argumento a `Path Relinking`, además de `S'` solución resultante de la busqueda local.
+
+Path Relinking definirá un nuevo conjunto `differences` de pares de asignación `(i, f)` tales que `f = Se(i) && Se(i) != S(i)`, representación de las diferencias entre ambas soluciones. Ademas, se define `Sm` como la mejor solución entre `{S, Se}` y finalmente se crea una solucion temporal `St` tal que `St = S`.
+
+Se sabe que, como `Se` es parte de `elites` entonces, en general es una buena solución, si se intenta asemejar `S` a `Se` es posible crear una nueva mejor solución `S''`. Por lo tanto, por cada par `(i, f)` dentro de `differences` se le asignara a `St(i)` la frecuencia `f`. Si la nueva solución generada mejor el costo total de `Sm` entonces `Sm = St`.
+
+Pseudo código de GRASP con Path relinking:
+```
+Solution grasp() {
+    Sg = greedy_solution();
+    while(No se cumpla criterio de parada) {
+        a  = Generar un numero entre [0..1];
+        Se = Solucion aleatoria dentro de elites
+        S  = greedy_randomized_construction(a);
+        S  = local_search(S);
+        S  = Path_relinking(S, Se);
+        if(Costo(S) < Costo(Sg)) {
+            Agregar S a elites
+            Sg = S;
+        }
+    }
+    return Sg;
+}
+```
+
+Pseudo código de Path relinking:
+```
+Solution path_relinking(Solution S, Solution Se) {
+    differences = diferencias entre S y Se
+    Sm = mejor entre S y Se
+    St = S;
+
+    while(differences no este vacia) {
+        Assign = Obtener mejor assign de differences
+
+        Asignar Assign a St
+        if(Costo(St) < Costo(Sm)) {
+          Sm = St;
+        }
+    }
+    return Sm;
+}
+```
 
 ### Reactive GRASP
 
