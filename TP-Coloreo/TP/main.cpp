@@ -40,7 +40,8 @@ int K = 4; // Cantidad de elementos maximo de CRL
 unsigned int seed = 23;
 mt19937 mt(seed);
 ////////////////////////////////////////////// Reactive GRASP //////////////////////////////////////////////
-int count_of_iteration_for_recalculate = 100;
+int count_of_iteration_for_recalculate = 20;
+
 vector<double> possibles_a = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
 vector<double> quality_of_average_costs = vector<double>(possibles_a.size());
 vector<double> probabilities = vector<double>(possibles_a.size(), 1.0/ possibles_a.size()); // Todos arrancan con probabilidad 1 / m donde m es la cantidad de elementos (arranca equiprobable)
@@ -270,26 +271,21 @@ bool stop_criteria() { return current_iteration >= maximum_iterations || time(nu
 void re_calculate_probabilities(int &best_current_cost) {
     for (int i = 0; i < cost_averages.size(); i++) {
         if(!all_cost_for_each_a[i].empty()) {
-            cost_averages[i] = accumulate(all_cost_for_each_a[i].begin(),all_cost_for_each_a[i].end(), 0) / all_cost_for_each_a[i].size(); // calcula el promedio de los costos con ese valor de a
+            cost_averages[i] = accumulate(all_cost_for_each_a[i].begin(), all_cost_for_each_a[i].end(), 0) / all_cost_for_each_a[i].size(); // calcula el promedio de los costos con ese valor de a
         }
     }
 
     for(int q = 0; q < quality_of_average_costs.size(); q++) {
         if(cost_averages[q] != 0) {
-            quality_of_average_costs[q] = best_current_cost / cost_averages[q];
+            quality_of_average_costs[q] = static_cast<double>(best_current_cost) / cost_averages[q];
         }
     }
 
-    //TODO: Revisar que probabilidad asignarle a los valores que aun no tienen soluciones
     for(int p = 0; p < probabilities.size(); p++) {
         auto summ_of_averages = accumulate(quality_of_average_costs.begin(), quality_of_average_costs.end(), 0.0);
-        if(summ_of_averages != 0) {
+        if(summ_of_averages != 0 && quality_of_average_costs[p] != 0) {
             probabilities[p] = quality_of_average_costs[p] / summ_of_averages;
-        } else {
-            probabilities[p] = 1;
         }
-
-//        cout << "probabilidad para a = " << possibles_a[p] << " = " << probabilities[p] << endl;
     }
 }
 
@@ -306,7 +302,7 @@ Solution grasp() {
     Solution global_solution = greedy_solution();
 
     while(!stop_criteria()) {
-        if(current_iteration % count_of_iteration_for_recalculate) { re_calculate_probabilities(global_solution.cost); }
+        if(current_iteration % count_of_iteration_for_recalculate == 0) { re_calculate_probabilities(global_solution.cost); }
         int pos_a = get_random_pos_of_a();
         double a = possibles_a[pos_a]; // Con a = 0 se vuelve un algoritmo completamente greedy, mientras que con a = 1 se vuelve una estrategia aleatoria
         Solution current_solution = greedy_randomized_construction(a);
@@ -315,7 +311,6 @@ Solution grasp() {
         all_cost_for_each_a[pos_a].push_back(current_solution.cost); // Agrega el costo de la solucion actual al vector de costos para esa posicion de a
 
         if(current_solution.cost < global_solution.cost) {
-            cout << "Mejore " << global_solution.cost << " por " << current_solution.cost << endl;
             global_solution = current_solution;
         }
         current_iteration++;
@@ -326,7 +321,7 @@ Solution grasp() {
 }
 
 int main() {
-    std::string filename = R"(..\instances\miles250.colcep)";
+    std::string filename = R"(..\instances\miles500.colcep)";
     std::ifstream istrm(filename);
 
     if(istrm.is_open()) {
