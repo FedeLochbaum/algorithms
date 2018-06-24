@@ -285,15 +285,17 @@ void re_calculate_probabilities(int &best_current_cost) {
         auto summ_of_averages = accumulate(quality_of_average_costs.begin(), quality_of_average_costs.end(), 0.0);
         if(summ_of_averages != 0) {
             probabilities[p] = quality_of_average_costs[p] / summ_of_averages;
+        } else {
+            probabilities[p] = 1;
         }
 
-        cout << "probabilidad para a = " << possibles_a[p] << " = " << probabilities[p] << endl;
+//        cout << "probabilidad para a = " << possibles_a[p] << " = " << probabilities[p] << endl;
     }
 }
 
 int get_random_pos_of_a() {
-    uniform_real_distribution<double> dist(0, possibles_a.size());
-    return static_cast<int>(dist(mt));
+    std::discrete_distribution<int> distribution (probabilities.begin(), probabilities.end());
+    return distribution(mt);
 }
 
 Solution grasp() {
@@ -313,6 +315,7 @@ Solution grasp() {
         all_cost_for_each_a[pos_a].push_back(current_solution.cost); // Agrega el costo de la solucion actual al vector de costos para esa posicion de a
 
         if(current_solution.cost < global_solution.cost) {
+            cout << "Mejore " << global_solution.cost << " por " << current_solution.cost << endl;
             global_solution = current_solution;
         }
         current_iteration++;
@@ -323,7 +326,7 @@ Solution grasp() {
 }
 
 int main() {
-    std::string filename = R"(..\instances\miles500.colcep)";
+    std::string filename = R"(..\instances\miles250.colcep)";
     std::ifstream istrm(filename);
 
     if(istrm.is_open()) {
