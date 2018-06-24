@@ -25,13 +25,13 @@ int inf = numeric_limits<int>::max();
 vi top_sort;
 vector<bool> marks;
 int current, i, j, cost;
-int T; // numero de frecuecncias
-int N; // numero de antenas disponibles
-int M; // numero de conflictos posibbles por asignar con la misma frecuencia
-mi graph; // lista de adyacencias
-vector<Frequency> f; // vector de Frequency ordenado por costo
-vi cost_of_freqs; // indica el costo de usar la frecuencia i
-mi cost_conflict_matrix; // costo de colisiones de frecuencias para el par de antenas i, k
+int T; // Numero de frecuecncias
+int N; // Numero de antenas disponibles
+int M; // Numero de conflictos posibbles por asignar con la misma frecuencia
+mi graph; // Lista de adyacencias
+vector<Frequency> f; // Vector de Frequency ordenado por costo
+vi cost_of_freqs; // Indica el costo de usar la frecuencia i
+mi cost_conflict_matrix; // Costo de colisiones de frecuencias para el par de antenas i, k
 
 
 ///////////////////////////////////////////// Global variables for greedy randomized construction //////////
@@ -45,12 +45,12 @@ int count_of_iteration_for_recalculate = 20;
 vector<double> possibles_a = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
 vector<double> quality_of_average_costs = vector<double>(possibles_a.size());
 vector<double> probabilities = vector<double>(possibles_a.size(), 1.0/ possibles_a.size()); // Todos arrancan con probabilidad 1 / m donde m es la cantidad de elementos (arranca equiprobable)
-vector<int> cost_averages = vi(possibles_a.size()); // el costo promedio de soluciones encontradas para cada a_i
-vector<vi> all_cost_for_each_a = vector<vi>(possibles_a.size()); // todos los costos guardados, usados para calcular cost_averages
+vector<int> cost_averages = vi(possibles_a.size()); // El costo promedio de soluciones encontradas para cada a_i
+vector<vi> all_cost_for_each_a = vector<vi>(possibles_a.size()); // Todos los costos guardados, usados para calcular cost_averages
 ////////////////////////////////////////////// Stop Criteria ///////////////////////////////////////////////
 int maximum_iterations = 10000;
 int current_iteration;
-int maximum_time = 300; // 5 minutos
+int maximum_time = 300; // 5 Minutos
 time_t start_time;
 
 ///////////////////////////////////////////// Order function //////////////////////////////////////////////
@@ -64,8 +64,8 @@ struct Greater_compare_assign{ bool operator()(const pair<int, pi> &t1, const pa
 struct Less_compare_assign{ bool operator()(const pair<int, pi> &t1, const pair<int, pi> &t2) const { return t1.first > t2.first; } };
 
 struct Solution {
-    vi used_frequencies; // used_frequencies[i] indica cuantas antenas usan la frecuencia i
-    vi assings; // assings[i] indica la frecuencia asignada al vertice i.
+    vi used_frequencies; // used_frequencies[i] Indica cuantas antenas usan la frecuencia i
+    vi assings; // assings[i] Indica la frecuencia asignada al vertice i.
     int cost;
 
     Solution();
@@ -142,7 +142,7 @@ inline int Solution::cost_of_current_assign(int &vertex, int &new_assign) {
     int current_cost = 0;
     int  current_assign = assings[vertex];
 
-    if (current_assign == -1) { return 0; } // si la anterior asignacion era -1, no generaba ningun costo tal asignacion
+    if (current_assign == -1) { return 0; } // Si la anterior asignacion era -1, no generaba ningun costo tal asignacion
     if (used_frequencies[current_assign] == 1) current_cost += cost_of_freqs[ current_assign ]; // si la frecuencia solo estaba usada por este vertice
     else
         for(auto &u : graph[vertex]) { if (assings[u] == current_assign) { current_cost += cost_conflict_matrix[u][vertex]; } }
@@ -155,7 +155,7 @@ inline int Solution::cost_of_new_assign(int &vertex, int &new_assign) {
 
     if (new_assign == -1) { return 0; }
 
-    if(used_frequencies[new_assign] == 0) current_cost += cost_of_freqs[new_assign]; // si la frecuencia no esta usada
+    if(used_frequencies[new_assign] == 0) current_cost += cost_of_freqs[new_assign]; // Si la frecuencia no esta usada
     else
         for(auto &u : graph[vertex]) { if(assings[u] == new_assign) { current_cost += cost_conflict_matrix[u][vertex]; } }
 
@@ -163,11 +163,11 @@ inline int Solution::cost_of_new_assign(int &vertex, int &new_assign) {
 }
 
 int Solution::cost_of_assign(pi i) {
-    // al costo de la nueva asignacion le resto el costo de la vieja asignacion. Por lo tanto, si es negativo, el la solucion es mejor
+    // Al costo de la nueva asignacion le resto el costo de la vieja asignacion. Por lo tanto, si es negativo, el la solucion es mejor
     return cost_of_new_assign(i.first, i.second) - cost_of_current_assign(i.first, i.second);
 }
 
-void Solution::show_solution() { // por ahora no escribe en files
+void Solution::show_solution() { // Por ahora no escribe en files
     for(auto &frec_id : assings) { cout << frec_id << endl; }
     cout << "Cost: " << cost << endl;
 }
@@ -211,7 +211,7 @@ Solution greedy_solution() {
     Solution sol = Solution();
     for (auto &vertex : top_sort){
         for(Frequency freq : f) {
-            if(sol.assings[vertex] == -1) { // si no tiene ninguna frecuencia asignada.
+            if(sol.assings[vertex] == -1) { // Si no tiene ninguna frecuencia asignada.
                 sol.apply_assign({vertex, freq.number_id});
             } else {
                 if(sol.cost_of_assign({vertex, freq.number_id}) < 0) {

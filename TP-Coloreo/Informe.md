@@ -138,12 +138,39 @@ Se han propuesto dos posibles aplicaciones de path relinking en combinación con
 - Utilizar path relinking como una estrategia de intensificación aplicada a cada solución obtenida después de la fase de búsqueda local.
 
 # Algoritmo
+Como solución para el presente problema, se desarrollo una versión general de `GRASP` que designa valores aleatorios equiprobables para `a`, determinando la cota superior para cada iteración del algoritmo. Además, se implementaron dos variantes para dicha metaheurística, `Path relinking`, `Reactive GRASP` y una versión donde se utilizan ambas.
+
+### Estructuras euxiliares
+Para simplificar la legibilidad del código, se  definieron dos estructuras. Por un lado `Frequency` la representación de una frecuencia, la cual contiene su identificador como la iesima frecuencia y su costo en caso de ser usada. Por otro lado, se definió `Solution` estructura que contiene `assigns` un vector de las asignaciones antena -> frecuencia, `used_frequencies` un vector de las frecuencias utilizadas, indicando cuantas antenas usa la iesima frecuencia y finalmente, `cost` el costo actual de la solución.
 
 ### Heurística Greedy
+Construyendo una nueva Solución `S` donde no existe ninguna asignación, el algoritmo le asigna a cada una de las antenas la frecuencia que posee menor costo. Luego, haciendo uso del orden topológico del grafo, el algoritmo recorre en dicho orden cada antena `n` y, por cada frecuencia `f`, calcula el costo incremental de asignarle a la antena `n` la frecuencia `f`. Si dicho costo es menor a 0, quiere decir que el costo de la solución `S` disminuirá si se aplica dicha asignación, por lo tanto se reemplaza la asignación anterior de `n` por `f`.
 
-### Heurística Local Search
+Pseudo código de construccion greedy:
+
+```
+Solution greedy_solution() {
+    S = Nueva solución;
+    for (n : orden topológico){
+        for(f : frecuencias) {
+            if(n no tiene asignación) {
+                Asignarle a n la frecuencia f // frecuencias esta ordenada
+            } else {
+                if(Costo incremental(n, f) < 0) {
+                    Asignarle a n la frecuencia f
+                }
+            }
+        }
+    }
+    return S;
+}
+```
+Como dicho algoritmo da resultados aceptables dentro de los parametros, se lo utiliza como solución inicial en la implementación de `GRASP`.
 
 ### Heurística Greedy Randomized Construction
+
+
+### Heurística Local Search
 
 ### GRASP
 
@@ -178,3 +205,5 @@ Se han propuesto dos posibles aplicaciones de path relinking en combinación con
 ### Conclusión general
 
 ### Alternativas de implementación
+
+# Referencias
