@@ -145,13 +145,15 @@ Se han propuesto dos posibles aplicaciones de path relinking en combinación con
 
 ### Heurística Greedy Randomized Construction
 
-### Esquema GRASP
+### GRASP
 
 ### Criterio de parada
 
 ### Ordenes de complejidad
 
+### GRASP + Path relinking
 
+### Reactive GRASP
 
 # Experimentación
 
