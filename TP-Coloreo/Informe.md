@@ -256,7 +256,7 @@ Se sabe que, como `Se` es parte de `elites` entonces, en general es una buena so
 
 Pseudo código de GRASP con Path relinking:
 ```
-Solution grasp() {
+Solution grasp_with_path_relinking() {
     Sg = greedy_solution();
     while(No se cumpla criterio de parada) {
         a  = Generar un numero entre [0..1];
@@ -316,7 +316,7 @@ Posteriormente se utiliza una función discreta de probabilidad que, utilizando 
 Pseudo código de Reactive GRASP:
 
 ```
-Solution grasp() {
+Solution reactive_grasp() {
     Sg = greedy_solution();
     while(No se cumpla criterio de parada) {
         if(Condicion para reconteo) {
@@ -352,6 +352,31 @@ void re_calculate_probabilities(int Sg) {
   }
 }
 ```
+### Ordenes de complejidad
+A continuación se listan los ordenes de complejidad de cada uno de los algoritmos:
+
+Sea `n` = Cantidad de antenas de la instancia.
+
+Sea `f` = Cantidad de frecuencias de la instancia.
+
+Sea `as` = Cantidad de posibles valores de a.
+
+Sea `j` = Cantidad de máxima soluciones encontradas hasta el momento para un valor de a.
+
+- `Heurística Greedy: O( n * f )`
+
+
+- `Randomized Greedy: O( n^2 * f )`
+
+
+- `Local Search: O( n * f )`
+
+
+- `Path Relinking: O( n )`
+
+
+- `Recalculate Probabilities: O ( as * j ) = O( j )` Dado que `as` es un valor fijo.
+
 
 # Experimentación
 
