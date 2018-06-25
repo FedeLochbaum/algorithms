@@ -293,8 +293,65 @@ Solution path_relinking(Solution S, Solution Se) {
 ```
 
 ### Reactive GRASP
+En el punto anterior se explico como, `Path relinking` puede suplir la falta de memorización de soluciones que posee `GRASP`, permitiendo recordar las mejores soluciones encontradas y así utilizarlas como modelos para el acercamiento a posibles mejores soluciones.
 
-### Ordenes de complejidad
+`Reactive GRASP` intenta suplir otra de las faltas propias de `GRASP`, en este caso, propone una forma de, probababilis-ticamente determinar que opciones ha de tomar el algoritmo para construir mejores soluciones a medida que transcurren las iteraciones.
+
+Se define el conjunto `possibles_a` como `{0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0}` el cual determina todos los posibles valores de `a` para calcular la cota superior de posibles asignaciones en cada fase constructiva. Además, se definen:
+
+- `All costs`: Conjunto que determina para cada `a_i` el conjunto de costos de aquellas soluciones creadas con `a = a_i`
+
+- `Cost_averages`: Conjunto que determina para cada `a_i` el costo promedio de todas las soluciones creadas con `a = a_i`
+
+- `Quality_of_average_costs`: Conjunto que determinar para cada `a_i` la calidad que posee el costo promedio para `a_i` en comparación a la mejor solución encontrada
+
+- `Probabilities`: Conjunto que determina la probabilidad para cada `a_i` de ser seleccionado en la siguiente iteración
+
+A la implementación de GRASP se le agregara un re conteo cada cierto tiempo, de las probabilidades para cada posible valor de `a`. Además, despues de finalizar cada fase constructiva, se adicionara el costo de la nueva solución a `All costs` para su correspondiente `a`. Esto ultimo es necesario para poder llevar la cuenta de las soluciones encontradas con cada diferente valor de a y así poder calcular, tanto el valor promedio, la calidad de la solución como la probabilidad de ser seleccionada en las siguientes iteraciones.
+
+Por lo tanto, cada N iteraciones se aplicara el reconteo de probabilidades, el cual  calculara nuevamente en `Cost_averages` el costo promedio de solución encontrada para cada a, la calidad de solución en `Quality_of_average_costs` comparada con la mejor solución global encontrada hasta ese momento y finalmente, se calculara en `Probabilities` la probabilidad de cada `a_i` dividiendo la calidad de la solución promedio para `a_i` sobre la sumatoria de calidades de funciones para todo el resto de `a_j`.
+
+Posteriormente se utiliza una función discreta de probabilidad que, utilizando `Probabilities` selecciona en cada iteración el valor de `a` correspondiente.
+
+Pseudo código de Reactive GRASP:
+
+```
+Solution grasp() {
+    Sg = greedy_solution();
+    while(No se cumpla criterio de parada) {
+        if(Condicion para reconteo) {
+          Re-calcular-Probabilidades(Sg);
+        }
+
+        a = Obtener a en base a Probabilities;
+        S = greedy_randomized_construction(a);
+        S = local_search(S);
+
+        Agregar Cost(S) a All costs para a
+        if(Costo(S) < Costo(Sg)) {
+            Sg = S;
+        }
+    }
+    return Sg;
+}
+```
+
+Pseudo código de Re_calculate_probabilities:
+```
+void re_calculate_probabilities(int Sg) {
+  for(i  : Cost_averages){
+    Cost_averages[i] = sumatoria de All_cost[i] / All_cost[i].size();
+  }
+
+  for(i : Quality_of_average_costs) {
+    Quality_of_average_costs[i] = Costo(Sg) / Cost_averages[i];
+  }
+
+  for(i : Probabilities) {
+    Probabilities[i] = Quality_of_average_costs[i] / Sumatoria de Quality_of_average_costs;
+  }
+}
+```
 
 # Experimentación
 
