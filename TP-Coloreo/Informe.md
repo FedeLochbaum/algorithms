@@ -389,8 +389,40 @@ Se intentara deducir que factores permiten aproximar el algoritmo a mejores solu
 
 ### Entorno de prueba
 
+#### Hardware
+
+ - Procesador: 	Intel Core i7-7700HQ
+
+ - Arquitectura: 64 bits
+
+ - Velocidad: 3.8 GHz
+
+ - Memoria: 16GB de memoria RAM
+
+#### Software
+
+  - Sistema Operativo: Microsoft Windows 10
+
+  - IDE: Clion 2018 1.2
 
 ### Tipos de pruebas
+Las instancias utilizadas para las pruebas seran:
+
+  - `dsj500.1` con 500 antenas 60, frecuencias y 3555 posibles conflictos.
+
+  - `miles250` con 128 antenas 9, frecuencias y 387 posibles conflitos.
+
+  - `miles500` con 128 antenas 75, frecuencias y 1170 posibles conflitos.
+
+  - `miles750` con 128 antenas 35, frecuencias y 2113 posibles conflitos.
+
+  - `miles1000` con 128 antenas 45, frecuencias y 3216 posibles conflitos.
+
+  - `miles1500` con 128 antenas 75, frecuencias y 5198 posibles conflitos.
+
+  - `r250.1` con 250 antenas 20, frecuencias y 867 posibles conflitos.
+
+  - `r1000.1` con 1000 antenas 55, frecuencias y 14378 posibles conflitos.
 
 ### Pruebas
 
