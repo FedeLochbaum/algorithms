@@ -425,6 +425,84 @@ Las instancias utilizadas para las pruebas seran:
   - `r1000.1` con 1000 antenas 55, frecuencias y 14378 posibles conflitos.
 
 ### Pruebas
+Las pruebas inicialmente se haran con un tiempo limite de 300 segundos (5 minutos) probando diferentes configuraciones para: la longitud de `RCL`, la longitud de `elites` o la cantidad de iteraciones para ejecutar el reconteo de probabilidades.
+
+#### Primer fase
+La primer serie de pruebas se haran con `K = 8`, `|elites| = 5` y cantidad de iteraciones necesarias para reconteo de probabilidades = 100.
+
+##### Dsj500.1
+
+|            Instancia            | Costo mejor solucion | Cantidad de iteraciones |
+|:-------------------------------:|----------------------|-------------------------|
+|              GRASP              |                      |                         |
+|      GRASP + Path relinking     |                      |                         |
+|          Reactive GRASP         |                      |                         |
+| Reactive GRASP + Path relinking |                      |                         |
+
+##### Miles250
+
+|            Instancia            | Costo mejor solucion | Cantidad de iteraciones |
+|:-------------------------------:|----------------------|-------------------------|
+|              GRASP              |                      |                         |
+|      GRASP + Path relinking     |                      |                         |
+|          Reactive GRASP         |                      |                         |
+| Reactive GRASP + Path relinking |                      |                         |
+
+##### Miles500
+
+|            Instancia            | Costo mejor solucion | Cantidad de iteraciones |
+|:-------------------------------:|----------------------|-------------------------|
+|              GRASP              |                      |                         |
+|      GRASP + Path relinking     |                      |                         |
+|          Reactive GRASP         |                      |                         |
+| Reactive GRASP + Path relinking |                      |                         |
+
+##### Miles750
+
+|            Instancia            | Costo mejor solucion | Cantidad de iteraciones |
+|:-------------------------------:|----------------------|-------------------------|
+|              GRASP              |                      |                         |
+|      GRASP + Path relinking     |                      |                         |
+|          Reactive GRASP         |                      |                         |
+| Reactive GRASP + Path relinking |                      |                         |
+
+##### Miles1000
+
+|            Instancia            | Costo mejor solucion | Cantidad de iteraciones |
+|:-------------------------------:|----------------------|-------------------------|
+|              GRASP              |                      |                         |
+|      GRASP + Path relinking     |                      |                         |
+|          Reactive GRASP         |                      |                         |
+| Reactive GRASP + Path relinking |                      |                         |
+
+##### Miles1500
+
+|            Instancia            | Costo mejor solucion | Cantidad de iteraciones |
+|:-------------------------------:|----------------------|-------------------------|
+|              GRASP              |                      |                         |
+|      GRASP + Path relinking     |                      |                         |
+|          Reactive GRASP         |                      |                         |
+| Reactive GRASP + Path relinking |                      |                         |
+
+##### R250.1
+
+|            Instancia            | Costo mejor solucion | Cantidad de iteraciones |
+|:-------------------------------:|----------------------|-------------------------|
+|              GRASP              |                      |                         |
+|      GRASP + Path relinking     |                      |                         |
+|          Reactive GRASP         |                      |                         |
+| Reactive GRASP + Path relinking |                      |                         |
+
+##### R1000.1
+
+|            Instancia            | Costo mejor solucion | Cantidad de iteraciones |
+|:-------------------------------:|----------------------|-------------------------|
+|              GRASP              |                      |                         |
+|      GRASP + Path relinking     |                      |                         |
+|          Reactive GRASP         |                      |                         |
+| Reactive GRASP + Path relinking |                      |                         |
+
+
 
 # Conclusiones
 
