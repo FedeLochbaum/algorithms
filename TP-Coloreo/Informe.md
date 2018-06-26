@@ -252,7 +252,7 @@ En cada iteración de `GRASP`, se elegirá aleatoriamente una solución `Se` den
 
 Path Relinking definirá un nuevo conjunto `differences` de pares de asignación `(i, f)` tales que `f = Se(i) && Se(i) != S(i)`, representación de las diferencias entre ambas soluciones. Ademas, se define `Sm` como la mejor solución entre `{S, Se}` y finalmente se crea una solucion temporal `St` tal que `St = S`.
 
-Se sabe que, como `Se` es parte de `elites` entonces, en general es una buena solución, si se intenta asemejar `S` a `Se` es posible crear una nueva mejor solución `S''`. Por lo tanto, por cada par `(i, f)` dentro de `differences` se le asignara a `St(i)` la frecuencia `f`. Si la nueva solución generada mejor el costo total de `Sm` entonces `Sm = St`.
+Se sabe que, como `Se` es parte de `elites` entonces, en general es una buena solución, si se intenta asemejar `S` a `Se` es posible crear una nueva mejor solución `S''`. Por lo tanto, por cada par `(i, f)` dentro de `differences` se le asignara a `St(i)` la frecuencia `f` aplicandole luego una busqueda local. Si la nueva solución generada mejor el costo total de `Sm` entonces `Sm = St`.
 
 Pseudo código de GRASP con Path relinking:
 ```
@@ -284,6 +284,7 @@ Solution path_relinking(Solution S, Solution Se) {
         Assign = Obtener mejor assign de differences
 
         Asignar Assign a St
+        Aplicar busqueda local sobre St
         if(Costo(St) < Costo(Sm)) {
           Sm = St;
         }
@@ -372,7 +373,7 @@ Sea `j` = Cantidad de máxima soluciones encontradas hasta el momento para un va
 - `Local Search: O( n * f )`
 
 
-- `Path Relinking: O( n )`
+- `Path Relinking: O( n^2 * f )`
 
 
 - `Recalculate Probabilities: O ( as * j ) = O( j )` Dado que `as` es un valor fijo.
@@ -381,8 +382,13 @@ Sea `j` = Cantidad de máxima soluciones encontradas hasta el momento para un va
 # Experimentación
 
 ### Introducción a las pruebas
+Las pruebas se realizaran sobre 8 instancias provistas para este fin. Se evaluaran diferentes resultados manipulando los diferentes tipos de configuraciones, ya sea, maximizando o minimizando la cantidad de posibles asignaciones a seleccionar en cada iteración (determinado por `K`), la cantidad de tiempo o cantidad de iteraciones limites para la ejecución del algoritmo, diferentes dimensiones para `elites` en caso de `Path relinking` o, el numero necesario de iteraciones para recalcular las probabilidades en caso de `Reactive GRASP`.
+
+Se intentara deducir que factores permiten aproximar el algoritmo a mejores soluciones, hallando los mejores valores globales para estos parametros. Además, se compararan los resultados encontrados en términos de la cantidad de iteraciones necesarias vs la calidad de dichas soluciones.
+
 
 ### Entorno de prueba
+
 
 ### Tipos de pruebas
 
@@ -397,7 +403,5 @@ Sea `j` = Cantidad de máxima soluciones encontradas hasta el momento para un va
 ### Mejoramiento de soluciones
 
 ### Conclusión general
-
-### Alternativas de implementación
 
 # Referencias

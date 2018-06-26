@@ -316,6 +316,7 @@ Solution path_relinking(Solution &current_sol, Solution &elite_sol) {
         queue.pop();
 
         new_current_solution.apply_assign(assign);
+        new_current_solution = local_search(new_current_solution);
         if(new_current_solution.cost < best_solution.cost) { best_solution = new_current_solution; }
     }
     return best_solution;
@@ -511,7 +512,7 @@ int main() {
             graph[j].push_back(i);
         }
 
-        reactive_grasp_with_path_relinking().show_solution();
+        grasp_with_path_relinking().show_solution();
     }
 
     return 0;
