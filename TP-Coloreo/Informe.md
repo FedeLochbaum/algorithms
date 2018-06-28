@@ -425,10 +425,10 @@ Las instancias utilizadas para las pruebas seran:
   - `r1000.1` con 1000 antenas 55, frecuencias y 14378 posibles conflitos.
 
 ### Pruebas
-Las pruebas inicialmente se haran con un tiempo limite de 300 segundos (5 minutos) probando diferentes configuraciones para: la longitud de `RCL`, la longitud de `elites` o la cantidad de iteraciones para ejecutar el reconteo de probabilidades.
+Las pruebas inicialmente se harán con un tiempo limite de 300 segundos (5 minutos) probando diferentes configuraciones para: la longitud de `RCL`, la longitud de `elites` o la cantidad de iteraciones para ejecutar el reconteo de probabilidades.
 
 #### Primer serie
-La primer serie de pruebas se haran con `K = 4`, `|elites| = 5` y cantidad de iteraciones necesarias para reconteo de probabilidades = 40.
+La primer serie de pruebas se harán con `K = 4`, `|elites| = 5` y cantidad de iteraciones necesarias para reconteo de probabilidades = 40.
 
 ##### Dsj500.1
 
@@ -503,7 +503,7 @@ La primer serie de pruebas se haran con `K = 4`, `|elites| = 5` y cantidad de it
 | Reactive GRASP + Path relinking |            24          |       9                  |
 
 #### Segunda serie
-La segunda serie de pruebas se haran con `K = 2`, `|elites| = 4` y cantidad de iteraciones necesarias para reconteo de probabilidades = 10.
+La segunda serie de pruebas se harán con `K = 2`, `|elites| = 4` y cantidad de iteraciones necesarias para reconteo de probabilidades = 10.
 
 ##### Dsj500.1
 
@@ -556,40 +556,85 @@ La segunda serie de pruebas se haran con `K = 2`, `|elites| = 4` y cantidad de i
 |:-------------------------------:|:--------------------:|:-----------------------:|
 |              GRASP              |         `483`             |          1365               |
 |      GRASP + Path relinking     |        `448`              |       140                  |
-|          Reactive GRASP         |                      |                         |
-| Reactive GRASP + Path relinking |                      |                         |
+|          Reactive GRASP         |              483        |            1365             |
+| Reactive GRASP + Path relinking |             448         |      144                   |
 
 ##### R250.1
 
 |            Instancia            | Costo mejor solucion | Cantidad de iteraciones |
 |:-------------------------------:|:--------------------:|:-----------------------:|
-|              GRASP              |                      |                         |
-|      GRASP + Path relinking     |                      |                         |
-|          Reactive GRASP         |                      |                         |
-| Reactive GRASP + Path relinking |                      |                         |
+|              GRASP              |            815          |       4917                  |
+|      GRASP + Path relinking     |               `666`       |        1357                 |
+|          Reactive GRASP         |                 815     |          5138               |
+| Reactive GRASP + Path relinking |               `662`       |      1361                   |
 
 ##### R1000.1
 
 |            Instancia            | Costo mejor solucion | Cantidad de iteraciones |
 |:-------------------------------:|:--------------------:|:-----------------------:|
-|              GRASP              |                      |                         |
-|      GRASP + Path relinking     |                      |                         |
-|          Reactive GRASP         |                      |                         |
-| Reactive GRASP + Path relinking |                      |                         |
+|              GRASP              |              23        |          91               |
+|      GRASP + Path relinking     |               23       |          9               |
+|          Reactive GRASP         |                23      |              89           |
+| Reactive GRASP + Path relinking |             23         |             9            |
 
 #### Tercera serie
-Como se puede observar en las pruebas anteriores, disminuyendo el valor de K a 2 no se logran demasiadas mejoras en comparacion a utilizar K = 4, contrariamente se hallan mejores solucoines en la Primer fase. Por lo tanto la tercera serie de pruebas se haran con `K = 4`, `|elites| = 4` y cantidad de iteraciones necesarias para reconteo de probabilidades = 10 pero con un tiempo limite de 10 minutos, asi se podra observar si realmente hay diferencias entre `Reactive GRASP` y `GRASP` ya que si bien ambas encuentran mismas soluciones optimas el tiempo necesario para llegar a ella desde `Reactive GRASP` es mucho menor.
+Como se puede observar en las pruebas anteriores, disminuyendo el valor de K a 2 no se logran demasiadas mejoras en comparación a las soluciones generadas utilizando K = 4, contrariamente se hallan mejores soluciones en la Primer fase. Por lo tanto, la tercera serie de pruebas se harán con `K = 4`, `|elites| = 4` y cantidad de iteraciones necesarias para reconteo de probabilidades = 10 pero con un tiempo limite de 10 minutos, así se podrá observar si realmente hay diferencias entre `Reactive GRASP` y `GRASP` ya que si bien ambas encuentran mismas soluciones óptimas, el tiempo necesario para llegar a ella desde `Reactive GRASP` es mucho menor.
 
+##### Miles750
+
+|            Instancia            | Costo mejor solucion | Cantidad de iteraciones | Nro de iteracion del ultimo optimo global |
+|:-------------------------------:|:--------------------:|:-----------------------:|:-----------------------------------------:|
+|              GRASP              |           1347           |            11046             |                10680                           |
+|      GRASP + Path relinking     |             1088         |              1483           |                        506                   |
+|          Reactive GRASP         |                1347      |            11425             |                        10680                   |
+| Reactive GRASP + Path relinking |              1088        |             1521            |                       506                    |
+
+##### Miles1000
+
+|            Instancia            | Costo mejor solucion | Cantidad de iteraciones | Nro de iteracion del ultimo optimo global |
+|:-------------------------------:|:--------------------:|:-----------------------:|:-----------------------------------------:|
+|              GRASP              |             `491`         |        6021                 |                     3879                      |
+|      GRASP + Path relinking     |              433        |          700               |                      138                     |
+|          Reactive GRASP         |             491         |             6197            |                     3879                      |
+| Reactive GRASP + Path relinking |             433         |             733            |                        138                   |
+
+
+##### Miles1500
+
+|            Instancia            | Costo mejor solucion | Cantidad de iteraciones | Nro de iteracion del ultimo optimo global |
+|:-------------------------------:|:--------------------:|:-----------------------:|:-----------------------------------------:|
+|              GRASP              |            492          |              2694           |                331                           |
+|      GRASP + Path relinking     |            448          |          277               |                162                           |
+|          Reactive GRASP         |                      |                         |                                           |
+| Reactive GRASP + Path relinking |                      |                         |                                           |
 
 
 # Conclusiones
 
 ### Conclusión de pruebas
+Habiendo concluido las pruebas, podemos observar que si definimos un K demasiado grande para RCL, en cada iteración de GRASP es posible que el espacio de busqueda sea tan grande que las soluciones encontradas no sean muy lejanas a las óptimas. Por otro lado, vemos que designando un valor de K demasiado chico (en este caso 2) los algoritmos encuentran buenas soluciones pero en muchas ocasiones levamente inferiores a las encontradas utilizando K = 4. Sin embargo, en algunas instancias, se encuentran mejores soluciones con K =2  que con K = 4. Además, vemos que, si bien la variante de Reactive grasp suena muy interesante y compleja, no refleja una gran diferencia de soluciones con respecto a grasp. Es posible que esto se deba a que es necesario permitirle un tiempo de ejecución mucho mas grande a Reactive. A pesar de estas leves diferencias entre grasp y reactive grasp, se ve una ventaja en la calidad de todas las soluciones encontradas por parte de Path relinkning. Parece ser que Path relinking nos brinda los mejores resultados para estas instancias.
 
-### Conclusión de ordenes de complejidad
+En general, se podría decir que todos los algoritmos encuentran muy buenas soluciones. Esto puede ser visto en miles500 donde todas las variantes encuentran la solución de costo 3 el cual se sabe que es la solución óptima. Si, es muy notoria la cantidad de iteraciones necesarias para llegar a tales resultados desde Path relinking en comparación con grasp.
 
-### Mejoramiento de soluciones
+Para concluir, habiendo ejecutado la fase 3 de pruebas, con un tiempo de ejecución mucho mayor, es posible observar que a medida que avanza el tiempo, los algoritmos encuentran mucho mejores soluciones, este es el caso de grasp con miles1000, donde pasa de encontrar una solución con costo 501 a encontrar una nueva solución con costo 491. Se cree que, además, se deberían comparar soluciones con K = 8, un valor cercano al óptimo encontrado pero levemente superior, así como probar diferentes longitudes de elites y agrandar la cantidad de iteraciones necesarias para re-calcular las probabilidades de las cotas superiores. En la mayoría de los resultados de la fase 3 se puede observar que las soluciones encontradas (óptimas) fueron halladas mucho antes de haber terminado el algoritmo, por lo que intuimos que una mayor cantidad de tiempo mejoraria notoriamente las 4 variantes de prueba.
 
 ### Conclusión general
+La implementación de grasp propuesta por este trabajo logro dar gratos resultados, generando soluciones de bajo costo y por sobre todo, consiguiendolas en pequeñas cantidades de tiempo. Si bien hace falta extender las pruebas probando aun mas posibles conbinaciones de K, elites, posibles a, etc; se cree que las pruebas realizadas muestran la performance de estos algoritmos. Se cree además, que es necesario hacer un ajuste de costo computacional en esta implementación para permitir una mayor cantidad de iteraciones en menor tiempo.
+
+Como comentario final y personal, fue de gran utilidad la documentación adjunta a la sección de referencias, la cual, desde la experiencia de cada paper se pueden ver diferentes variantes de implementación para estos mismos algoritmos y, a su vez, mostrando buenas configuraciones para lograr aun mejores resultados.
 
 # Referencias
+
+- Reactive grasp and tabu search based heuristics for the single source capacitated plant location problem - Huges Delmaire, Juan A. Diaz, Elena Fernandez
+
+- Reactive grasp: an application to a matrix decomposition problem in tdma traffic assignment - Marcelo Prais, Celso C. Ribeiro
+
+- Power transmission network by a greedy Randomized adaptive path relinking approach - Haroldo Faria, Silvio Binato, Mauricio G. C. Resende
+
+- Doubly reactive grasp procedure for the generalized uncapacitated P-Medians location problem - Geraldo Galdino, Caroline Nascimiento
+
+- Grasp for set packing problems - Xavier Delorme, X. Gandibleux, J. Rodriguez
+
+- Grasp with path relinking: Recent advances and application - Marcelo Prais, Celso C. Ribeiro
+
+- Un Algoritmo GRASP-Reactivo para resolver el problema de cortes 1D - Celso Ever Larico Mullisaca
