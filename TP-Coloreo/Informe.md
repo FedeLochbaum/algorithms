@@ -605,8 +605,8 @@ Como se puede observar en las pruebas anteriores, disminuyendo el valor de K a 2
 |:-------------------------------:|:--------------------:|:-----------------------:|:-----------------------------------------:|
 |              GRASP              |            492          |              2694           |                331                           |
 |      GRASP + Path relinking     |            448          |          277               |                162                           |
-|          Reactive GRASP         |                      |                         |                                           |
-| Reactive GRASP + Path relinking |                      |                         |                                           |
+|          Reactive GRASP         |             492         |             2715            |                331                           |
+| Reactive GRASP + Path relinking |              448        |                  268       |                  120                         |
 
 
 # Conclusiones
@@ -619,7 +619,7 @@ En general, se podría decir que todos los algoritmos encuentran muy buenas solu
 Para concluir, habiendo ejecutado la fase 3 de pruebas, con un tiempo de ejecución mucho mayor, es posible observar que a medida que avanza el tiempo, los algoritmos encuentran mucho mejores soluciones, este es el caso de grasp con miles1000, donde pasa de encontrar una solución con costo 501 a encontrar una nueva solución con costo 491. Se cree que, además, se deberían comparar soluciones con K = 8, un valor cercano al óptimo encontrado pero levemente superior, así como probar diferentes longitudes de elites y agrandar la cantidad de iteraciones necesarias para re-calcular las probabilidades de las cotas superiores. En la mayoría de los resultados de la fase 3 se puede observar que las soluciones encontradas (óptimas) fueron halladas mucho antes de haber terminado el algoritmo, por lo que intuimos que una mayor cantidad de tiempo mejoraria notoriamente las 4 variantes de prueba.
 
 ### Conclusión general
-La implementación de grasp propuesta por este trabajo logro dar gratos resultados, generando soluciones de bajo costo y por sobre todo, consiguiendolas en pequeñas cantidades de tiempo. Si bien hace falta extender las pruebas probando aun mas posibles conbinaciones de K, elites, posibles a, etc; se cree que las pruebas realizadas muestran la performance de estos algoritmos. Se cree además, que es necesario hacer un ajuste de costo computacional en esta implementación para permitir una mayor cantidad de iteraciones en menor tiempo.
+La implementación de grasp propuesta por este trabajo logro dar gratos resultados, generando soluciones de bajo costo y por sobre todo, consiguiendolas en pequeñas cantidades de tiempo. Si bien hace falta extender las pruebas probando aun mas posibles conbinaciones de K, elites, posibles a, etc; se cree que las pruebas realizadas muestran la performance de estos algoritmos. Sobre los ordenes de complejidad, es necesario hacer un ajuste de costo computacional en esta implementación para permitir una mayor cantidad de iteraciones en menor tiempo.
 
 Como comentario final y personal, fue de gran utilidad la documentación adjunta a la sección de referencias, la cual, desde la experiencia de cada paper se pueden ver diferentes variantes de implementación para estos mismos algoritmos y, a su vez, mostrando buenas configuraciones para lograr aun mejores resultados.
 
